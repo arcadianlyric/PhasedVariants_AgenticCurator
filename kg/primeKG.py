@@ -1,6 +1,13 @@
 import pandas as pd
 from collections import defaultdict
 import json
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--kg_path", type=str, required=False)
+
+args = parser.parse_args()
+kg_path = args.kg_path
 
 def load_primekg(kg_path):
     """加载PrimeKG数据"""
@@ -83,12 +90,12 @@ def find_common_associations(gene_pathways, gene_diseases, gene_phenotypes, gene
     
     return common_pathways, common_diseases, common_phenotypes
 
-def main():
+def query_primeKg(genes, kg_path):
     # 输入基因列表
-    genes = ["BRCA1", "TP53", "EGFR"]
+    # genes = ["BRCA1", "TP53", "EGFR"]
     
     # PrimeKG数据路径（需替换为实际路径）
-    kg_path = "../data/kg.csv"
+    # kg_path = "../data/kg.csv"
     
     # 输出JSON路径
     output_json = "gene_associations.json"
@@ -132,4 +139,7 @@ def main():
     print(f"Results saved to {output_json}")
 
 if __name__ == "__main__":
-    main()
+    # genes = ["BRCA1", "TP53", "EGFR"]
+    # kg_path = "../data/kg.csv"
+
+    query_primeKg(genes, kg_path)
