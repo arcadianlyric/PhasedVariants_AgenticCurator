@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser()
 if __name__ == "__main__":
     chrom, start, end = "22", 1, 26466075
     vcf_file = 'data/high.vcf.gz'
-    kg_path = "data/kg.csv"
+    kg_path = "db/kg.csv"
 
     hap1_results, hap2_results = analyze_haplotypes(vcf_file, chrom, start, end)
     hap1_dict, hap2_dict, genes = group_gene_ps(hap1_results, hap2_results, chrom, start, end)
