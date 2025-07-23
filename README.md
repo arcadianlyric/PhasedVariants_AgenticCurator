@@ -1,12 +1,12 @@
 ## Variant function annotation with Phasing information    
 
 ### Usage
-The main function in ./src/explore_phased_vcf.py:
+The main function in src/explore_phased_vcf.py:
 ```
 vcf_file=data/HG002_exon.vep.vcf.gz
 kg_path=db/kg.csv
 ref_fa=db/GCA_000001405.15_GRCh38_no_alt_analysis_set.ercc.fa.fai
-python $code --vcf_file $vcf_file --kg_path $kg_path --ref_fa $ref_fa 
+python explore_phased_vcf.py --vcf_file $vcf_file --kg_path $kg_path --ref_fa $ref_fa 
 ```
 
 ### Results  
