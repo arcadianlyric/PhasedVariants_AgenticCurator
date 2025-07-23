@@ -170,15 +170,14 @@ def plot_bar_chart(data, output_png='importance_bar.png'):
     print(f"Bar chart saved as {output_png}")
 
 def plot_graph():
-    data = load_json(INPUT)
+    data = load_json("results/gene_associations.json")
     
     G = build_network_graph(data)
 
-    plot_network_graph(G, output_html=OUTPUT)
+    plot_network_graph(G, output_html="results/network_graph.html")
     
     # plot_bar_chart(data, output_png='importance_bar.png')
 
 if __name__ == "__main__":
-    INPUT = f"../results/gene_associations.json"
-    OUTPUT = f'../results/network_graph.html'
+
     plot_graph()

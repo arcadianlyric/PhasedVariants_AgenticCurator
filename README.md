@@ -6,15 +6,17 @@ The main function in src/explore_phased_vcf.py:
 vcf_file=data/HG002_exon.vep.vcf.gz
 kg_path=db/kg.csv
 ref_fa=db/GCA_000001405.15_GRCh38_no_alt_analysis_set.ercc.fa.fai
-python explore_phased_vcf.py --vcf_file $vcf_file --kg_path $kg_path --ref_fa $ref_fa 
+output_path=phased_results
+python explore_phased_vcf.py --vcf_file $vcf_file --kg_path $kg_path --ref_fa $ref_fa --output_path $output_path  
 ```
 
 ### Results  
-Visulization [network plot](results/network_graph.html).  
+The output in ./results folder, including 2 files: network_graph.html and gene_associations.json.  
+The [network_graph.html](results/network_graph.html) is a interactive visulization.  
 A zoom in of one gene node [SETBP1](images/HG002_example.jpg).  
 
 ## Data Input  
-Output phased.vcf.gz from [cWGS](https://github.com/Complete-Genomics/DNBSEQ_Complete_WGS/tree/dev).  
+Data input as the output phased.vcf.gz from [cWGS](https://github.com/Complete-Genomics/DNBSEQ_Complete_WGS/tree/dev).  
 
 ### Background  
 Genomic phasing, the process of determining which genetic variants reside on the same chromosome (haplotype), is critical for unraveling complex genetic scenarios, such as compound heterozygosity or the effects of cis-regulatory variants. The foundation of this process lies in generating highly accurate and comprehensive phased data. At Complete Genomics, we have developed a robust pipeline [cWGS](https://github.com/Complete-Genomics/DNBSEQ_Complete_WGS/tree/dev), which produces high-fidelity phased VCF files with Deepvariant and HapCUT2.  

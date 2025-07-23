@@ -1,5 +1,6 @@
 data
 db
+test
 results/nohup.out
 results/phased_vep_results.txt
 parse_vep_csq.py

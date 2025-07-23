@@ -3,12 +3,6 @@ from collections import defaultdict
 import json
 import argparse
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--kg_path", type=str, required=False)
-
-args = parser.parse_args()
-kg_path = args.kg_path
-
 def load_primekg(kg_path):
     """load PrimeKG"""
     kg = pd.read_csv(kg_path)
@@ -121,12 +115,16 @@ def query_primeKg(genes, kg_path):
     }
     
     # save to JSON
-    with open(OUTPUT, 'w') as f:
+    with open("results/gene_associations.json", 'w') as f:
         json.dump(result, f, indent=2)
-    print(f"Results saved to {OUTPUT}")
+    # print(f"Results saved to {OUTPUT}")
 
 if __name__ == "__main__":
     # genes = ["BRCA1", "TP53", "EGFR"]
-    # kg_path = "../data/kg.csv"
-    OUTPUT = "../results/gene_associations.json"
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--kg_path", type=str, required=False)
+
+    args = parser.parse_args()
+    kg_path = args.kg_path
+
     query_primeKg(genes, kg_path)

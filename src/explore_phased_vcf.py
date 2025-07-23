@@ -14,23 +14,16 @@ from primeKG import query_primeKg
 from visualize_gene_pathway_disease_phenotype import plot_graph
 import argparse
 import subprocess
+import os
 
 parser = argparse.ArgumentParser()
-# parser.add_argument("--chrom", type=str, required=False)
-# parser.add_argument("--start", type=int, required=False)
-# parser.add_argument("--end", type=int, required=False)
-parser.add_argument("--vcf_file", type=str, required=False)
-parser.add_argument("--kg_path", type=str, required=False)
-parser.add_argument("--ref_fa", type=str, required=False)
-# parser.add_argument("--output_path", type=str, required=False)
+parser.add_argument("--vcf_file", type=str, required=True)
+parser.add_argument("--kg_path", type=str, required=True)
+parser.add_argument("--ref_fa", type=str, required=True)
 
 args = parser.parse_args()
-# chrom = args.chrom
-# start = args.start
-# end = args.end
 vcf_file = args.vcf_file
 kg_path = args.kg_path
-# output_path = args.output_path
 REF_FA = args.ref_fa
 
 def get_chrom_dict():
@@ -45,7 +38,9 @@ def get_chrom_dict():
 
 if __name__ == "__main__":
     # chrom, start, end = "22", 1, 26466075
-    
+    output_path = os.path.join('results')
+    subprocess.call(f'mkdir -p {output_path}', shell=True)
+
     chrom_dict = get_chrom_dict()
 
     chrom_list = [f'chr{chr}' for chr in range(1,23)] +['chrX']
@@ -59,7 +54,5 @@ if __name__ == "__main__":
         gene_names.extend(genes)
 
     ##  query KG, plot network, save to ../results
-    output_path = f'../results'
-    subprocess.call(f'mkdir -p {output_path}', shell=True)
     query_primeKg(gene_names, kg_path)
     plot_graph()

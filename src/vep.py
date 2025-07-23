@@ -14,18 +14,7 @@ import pysam
 import re
 from collections import defaultdict
 import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument("--chrom", type=str, required=False)
-parser.add_argument("--start", type=int, required=False)
-parser.add_argument("--end", type=int, required=False)
-parser.add_argument("--vcf_file", type=str, required=False)
-
-args = parser.parse_args()
-chrom = args.chrom
-start = args.start
-end = args.end
-vcf_file = args.vcf_file
-OUTPUT = '../results/phased_vep_results.txt'
+import os
 
 def create_transcript_to_gene_map(vep_vcf_file):
     """Create a dictionary mapping transcript IDs to gene names from VEP VCF output."""
@@ -230,7 +219,7 @@ def group_gene_ps(hap1_results, hap2_results, chrom, start, end):
     gene_names = []
     # name= f'chr{chrom}_{start}_{end}_vep_results.txt'
 
-    with open(OUTPUT, 'a') as f:
+    with open('results/phased_vep_results.txt', 'a') as f:
         print(f'{chrom}')
         for gene, ps_dict in hap1_dict.items():
             if gene == 'N/A':
@@ -265,5 +254,17 @@ def group_gene_ps(hap1_results, hap2_results, chrom, start, end):
 if __name__ == "__main__":
     # chrom, start, end = "22", 1, 26466075
     # vcf_file = '../data/high.vcf.gz'
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--chrom", type=str, required=False)
+    parser.add_argument("--start", type=int, required=False)
+    parser.add_argument("--end", type=int, required=False)
+    parser.add_argument("--vcf_file", type=str, required=False)
+
+    args = parser.parse_args()
+    chrom = args.chrom
+    start = args.start
+    end = args.end
+    vcf_file = args.vcf_file
+
     hap1_results, hap2_results = analyze_haplotypes(vcf_file, chrom, start, end)
     hap1_dict, hap2_dict, gene_names = group_gene_ps(hap1_results, hap2_results, chrom, start, end)
