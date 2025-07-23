@@ -13,7 +13,7 @@ python explore_phased_vcf.py --vcf_file $vcf_file --kg_path $kg_path --ref_fa $r
 ### Results  
 Output variants with VEP HIGH impact on both copies; vairants in network connected by diseases, phenotypes and pathways. There are 2 files in the ./results folder: network_graph.html and gene_associations.json. The [network_graph](images/network_graph.jpg) is a interactive visulization in [html](results/network_graph.html) format. A zoom in of one gene node [SETBP1](images/HG002_example.jpg).  
 
-## Data Input  
+### Data Input  
 Data input as the output phased.vcf.gz from [cWGS](https://github.com/Complete-Genomics/DNBSEQ_Complete_WGS/tree/dev).  
 
 ### Background  
