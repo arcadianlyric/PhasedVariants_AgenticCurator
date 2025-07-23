@@ -1,0 +1,6 @@
+data
+db
+results/nohup.out
+results/phased_vep_results.txt
+parse_vep_csq.py
+__pycache__
