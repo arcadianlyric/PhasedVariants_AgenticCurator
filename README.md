@@ -1,4 +1,4 @@
-## Variant function annotation with Phasing information    
+## Connecting genotype to phenotype with phasing information    
 
 ### Usage
 The main function in src/explore_phased_vcf.py:
@@ -31,7 +31,7 @@ With hapcut2.
 With VEP.  
 
 ### On Going  
-1. Pubmed, ClinVar based variant curation with LLM RAG   
+1. Pubmed, ClinVar based variant curation with LLM RAG
 2. Implement regulatory elements (promoter, enhancer etc.)  
 
 ### Reference  
