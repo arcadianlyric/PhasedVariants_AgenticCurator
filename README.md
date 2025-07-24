@@ -24,7 +24,7 @@ To automate this interpretation, building on the foundation of high-quality phas
 
 ### Methods and Materials  
 1. Public Knowledge graph database  
-With PrimeKG.     
+With PrimeKG, download kg.csv to ./db.     
 2. Phasing VCF  
 With hapcut2. 
 3. Variant annotation  
@@ -32,6 +32,7 @@ With VEP.
 
 ### On Going  
 1. Pubmed, ClinVar based variant curation with LLM RAG   
+2. Implement regulatory elements (promoter, enhancer etc.)  
 
 ### Reference  
 1. [VEP](https://www.ensembl.org/vep)  

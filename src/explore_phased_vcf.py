@@ -2,8 +2,8 @@
 usage:
 vcf_file=../data/HG002_exon.vep.vcf.gz
 kg_path=../db/kg.csv
-ref_fa=../db/GCA_000001405.15_GRCh38_no_alt_analysis_set.ercc.fa.fai
-python $code --vcf_file $vcf_file --kg_path $kg_path --ref_fa $ref_fa
+ref_fai=../db/GCA_000001405.15_GRCh38_no_alt_analysis_set.ercc.fa.fai
+python $code --vcf_file $vcf_file --kg_path $kg_path --ref_fai $ref_fai
 
 input VCF with VEP annotation:
 Format: Uploaded_variation|Location|Allele|Gene|Feature|Feature_type|Consequence|cDNA_position|CDS_position|Protein_position|Amino_acids|Codons|Existing_variation|IMPACT|SYMBOL
@@ -19,17 +19,17 @@ import os
 parser = argparse.ArgumentParser()
 parser.add_argument("--vcf_file", type=str, required=True)
 parser.add_argument("--kg_path", type=str, required=True)
-parser.add_argument("--ref_fa", type=str, required=True)
+parser.add_argument("--ref_fai", type=str, required=True)
 
 args = parser.parse_args()
 vcf_file = args.vcf_file
 kg_path = args.kg_path
-REF_FA = args.ref_fa
+REF_FAI = args.ref_fai
 
 def get_chrom_dict():
     chrom_dict = {}
 
-    with open(REF_FA, 'r') as f:
+    with open(REF_FAI, 'r') as f:
         for line in f:
             chrom, end, x, y, z = line.strip().split('\t')
             chrom_dict[chrom] = int(end)
