@@ -1,4 +1,4 @@
-## Variant function annotation with Phasing information    
+## Connecting genotype to phenotype with phasing information    
 
 ### Usage
 The main function in src/explore_phased_vcf.py:
