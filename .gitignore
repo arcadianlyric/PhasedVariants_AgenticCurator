@@ -1,7 +1,12 @@
 data
-test
-tmp
-results
-.DS_Store
 db
+test
+rag
+kg
+tmp
+results/nohup.out
+results/phased_vep_results.txt
+parse_vep_csq.py
+__pycache__
 *pdf
+.DS_Store
