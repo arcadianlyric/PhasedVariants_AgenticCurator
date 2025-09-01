@@ -1,0 +1,830 @@
+{
+  "genes": [
+    "LOC100288175",
+    "CDCP2",
+    "LINC01362",
+    "HRNR",
+    "GPATCH4",
+    "OR10X1",
+    "OR10J4",
+    "FCGR2A",
+    "FCGR2C",
+    "FMO2",
+    "VN1R5",
+    "OR9H1P",
+    "OR2L8",
+    "OR2T7",
+    "NAT8B",
+    "TMEM182",
+    "SCRN3",
+    "ST3GAL6-AS1",
+    "LINC02038",
+    "GBA3",
+    "DCHS2",
+    "LINC02059",
+    "ABCF1",
+    "MICA",
+    "HLA-DRA",
+    "HLA-DRB1",
+    "AK9",
+    "TNRC18",
+    "ZNF117",
+    "TYW1B",
+    "EXTL3",
+    "LOC101929528",
+    "OR1B1",
+    "LINP1",
+    "LINC01517",
+    "LINC01515",
+    "LGI1",
+    "OR52E1",
+    "OR4X1",
+    "OR5AL1",
+    "OR5AR1",
+    "SLC22A24",
+    "SLC22A10",
+    "TRIM64B",
+    "SLC37A4",
+    "OR10D3",
+    "OR8G3P",
+    "PEX5",
+    "MUC19",
+    "OR6C1",
+    "OR4K3",
+    "OR11H7",
+    "GPR33",
+    "SERPINA2",
+    "ZNF598",
+    "RBBP6",
+    "KRBOX5",
+    "PKD1L2",
+    "ZFPM1",
+    "KRTAP4-8",
+    "SETBP1",
+    "SERPINB11",
+    "FCGBP",
+    "PSG7",
+    "FUT2",
+    "DEFB126",
+    "GNRH2",
+    "KIZ",
+    "KRTAP19-6",
+    "GAB4",
+    "IGLV5-48",
+    "IGLV3-16",
+    "APOL4",
+    "WWC3",
+    "SUPT20HL1",
+    "NUDT11",
+    "MAGEE2",
+    "LOC101928508",
+    "TCEAL6",
+    "H2BW2"
+  ],
+  "common_pathways": [],
+  "common_diseases": [],
+  "common_phenotypes": [],
+  "details": {
+    "LOC100288175": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "CDCP2": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "LINC01362": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "HRNR": {
+      "pathways": [
+        "Neutrophil degranulation"
+      ],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "GPATCH4": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "OR10X1": {
+      "pathways": [
+        "Olfactory Signaling Pathway"
+      ],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "OR10J4": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "FCGR2A": {
+      "pathways": [
+        "Neutrophil degranulation",
+        "Regulation of actin dynamics for phagocytic cup formation",
+        "FCGR activation",
+        "FCGR3A-mediated IL10 synthesis",
+        "Role of phospholipids in phagocytosis"
+      ],
+      "diseases": [
+        "malaria",
+        "systemic lupus erythematosus (disease)",
+        "ulcerative colitis (disease)",
+        "subacute bacterial endocarditis",
+        "mucocutaneous lymph node syndrome",
+        "cystic fibrosis",
+        "dry eye syndrome",
+        "pediatric systemic lupus erythematosus",
+        "rheumatoid arthritis",
+        "inflammatory bowel disease",
+        "Sjogren syndrome"
+      ],
+      "phenotypes": []
+    },
+    "FCGR2C": {
+      "pathways": [],
+      "diseases": [
+        "Evans syndrome",
+        "autoimmune thrombocytopenic"
+      ],
+      "phenotypes": []
+    },
+    "FMO2": {
+      "pathways": [
+        "FMO oxidises nucleophiles"
+      ],
+      "diseases": [
+        "ovarian endometriosis",
+        "endometriosis (disease)",
+        "endometriosis of uterus"
+      ],
+      "phenotypes": []
+    },
+    "VN1R5": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "OR9H1P": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "OR2L8": {
+      "pathways": [
+        "Olfactory Signaling Pathway"
+      ],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "OR2T7": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "NAT8B": {
+      "pathways": [
+        "Amyloid fiber formation"
+      ],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "TMEM182": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "SCRN3": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "ST3GAL6-AS1": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "LINC02038": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "GBA3": {
+      "pathways": [
+        "Glycosphingolipid metabolism"
+      ],
+      "diseases": [
+        "squamous cell carcinoma of liver and intrahepatic biliary tract",
+        "liver cancer",
+        "undifferentiated carcinoma of liver and intrahepatic biliary tract",
+        "fibrolamellar hepatocellular carcinoma",
+        "hepatocellular carcinoma",
+        "pediatric hepatocellular carcinoma",
+        "substance-related disorder",
+        "substance abuse/dependence",
+        "adenocarcinoma of liver and intrahepatic biliary tract"
+      ],
+      "phenotypes": []
+    },
+    "DCHS2": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "LINC02059": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "ABCF1": {
+      "pathways": [
+        "ABC-family proteins mediated transport"
+      ],
+      "diseases": [
+        "pneumonia",
+        "pneumonitis"
+      ],
+      "phenotypes": []
+    },
+    "MICA": {
+      "pathways": [
+        "Immunoregulatory interactions between a Lymphoid and a non-Lymphoid cell"
+      ],
+      "diseases": [
+        "squamous cell carcinoma of liver and intrahepatic biliary tract",
+        "liver cancer",
+        "undifferentiated carcinoma of liver and intrahepatic biliary tract",
+        "fibrolamellar hepatocellular carcinoma",
+        "coronary aneurysm",
+        "hepatocellular carcinoma",
+        "pediatric hepatocellular carcinoma",
+        "adenocarcinoma of liver and intrahepatic biliary tract",
+        "idiopathic spontaneous coronary artery dissection",
+        "oral submucous fibrosis"
+      ],
+      "phenotypes": []
+    },
+    "HLA-DRA": {
+      "pathways": [
+        "PD-1 signaling",
+        "Phosphorylation of CD3 and TCR zeta chains",
+        "MHC class II antigen presentation",
+        "Downstream TCR signaling",
+        "Interferon gamma signaling",
+        "Generation of second messenger molecules",
+        "Translocation of ZAP-70 to Immunological synapse"
+      ],
+      "diseases": [
+        "frontal fibrosing alopecia",
+        "multiple sclerosis",
+        "staphylococcal toxic-shock syndrome",
+        "Graham Little-Piccardi-Lassueur syndrome",
+        "atypical juvenile parkinsonism",
+        "streptococcal toxic-shock syndrome",
+        "lichen planopilaris",
+        "lichen planus",
+        "Parkinson disease",
+        "juvenile onset Parkinson disease 19A",
+        "hereditary late onset Parkinson disease",
+        "parkinsonian-pyramidal syndrome",
+        "toxic shock syndrome",
+        "substance abuse/dependence",
+        "hemiparkinsonism-hemiatrophy syndrome",
+        "early-onset parkinsonism-intellectual disability syndrome",
+        "X-linked parkinsonism-spasticity syndrome"
+      ],
+      "phenotypes": []
+    },
+    "HLA-DRB1": {
+      "pathways": [
+        "PD-1 signaling",
+        "Phosphorylation of CD3 and TCR zeta chains",
+        "MHC class II antigen presentation",
+        "Downstream TCR signaling",
+        "Interferon gamma signaling",
+        "Generation of second messenger molecules",
+        "Translocation of ZAP-70 to Immunological synapse"
+      ],
+      "diseases": [
+        "systemic-onset juvenile idiopathic arthritis",
+        "systemic lupus erythematosus (disease)",
+        "lymphosarcoma",
+        "sarcoidosis",
+        "pancreatitis",
+        "juvenile idiopathic arthritis",
+        "X-linked adrenoleukodystrophy",
+        "type 1 diabetes mellitus",
+        "urticaria (disease)",
+        "eosinophilia-myalgia syndrome",
+        "drug-induced liver injury",
+        "scleroderma, familial progressive",
+        "diabetic ketoacidosis",
+        "IDDM 1",
+        "non-Hodgkin lymphoma",
+        "schizophrenia",
+        "lymphoma, non-Hodgkin, familial",
+        "subacute bacterial endocarditis",
+        "Crohn disease",
+        "oropharynx cancer",
+        "intrinsic asthma",
+        "subcutaneous panniculitis-like T-cell lymphoma",
+        "limbic encephalitis with LGI1 antibodies",
+        "leishmaniasis",
+        "typhoid fever",
+        "Moyamoya disease",
+        "Moyamoya disease with early-onset achalasia",
+        "diffuse large B-cell lymphoma",
+        "bipolar disorder",
+        "visceral leishmaniasis",
+        "limited cutaneous systemic sclerosis",
+        "asthma",
+        "reticulum cell sarcoma",
+        "major affective disorder",
+        "ulcerative colitis (disease)",
+        "CREST syndrome",
+        "diffuse scleroderma",
+        "central nervous system disease",
+        "Balo concentric sclerosis",
+        "autism susceptibility 1",
+        "Langerhans cell histiocytosis",
+        "narcolepsy without cataplexy",
+        "mantle cell lymphoma",
+        "salmonellosis",
+        "angioedema",
+        "interdigitating dendritic cell sarcoma",
+        "Burkitt lymphoma",
+        "rheumatoid arthritis",
+        "limited scleroderma",
+        "paratyphoid fever",
+        "diffuse cutaneous systemic sclerosis",
+        "autism (disease)",
+        "chronic beryllium disease",
+        "narcolepsy-cataplexy syndrome",
+        "autism spectrum disorder",
+        "Crohn's colitis",
+        "B-cell neoplasm",
+        "myalgia-eosinophilia syndrome associated with tryptophan",
+        "systemic sclerosis",
+        "multiple sclerosis",
+        "oropharyngeal carcinoma",
+        "lymphoma",
+        "ileocolitis",
+        "narcolepsy",
+        "bullous pemphigoid",
+        "follicular lymphoma",
+        "Crohn ileitis and jejunitis",
+        "membranous glomerulonephritis",
+        "pediatric systemic lupus erythematosus",
+        "allergic asthma",
+        "neoplasm of mature B-cells",
+        "inflammatory bowel disease"
+      ],
+      "phenotypes": []
+    },
+    "AK9": {
+      "pathways": [
+        "Interconversion of nucleotide di- and triphosphates"
+      ],
+      "diseases": [
+        "congenital myasthenic syndrome"
+      ],
+      "phenotypes": []
+    },
+    "TNRC18": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "ZNF117": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "TYW1B": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "EXTL3": {
+      "pathways": [
+        "XBP1(S) activates chaperone genes"
+      ],
+      "diseases": [
+        "immunoskeletal dysplasia with neurodevelopmental abnormalities"
+      ],
+      "phenotypes": []
+    },
+    "LOC101929528": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "OR1B1": {
+      "pathways": [
+        "Olfactory Signaling Pathway"
+      ],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "LINP1": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "LINC01517": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "LINC01515": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "LGI1": {
+      "pathways": [
+        "LGI-ADAM interactions"
+      ],
+      "diseases": [
+        "unipolar depression",
+        "dysthymic disorder",
+        "neurotic disorder",
+        "anxiety disorder",
+        "Autosomal dominant epilepsy with auditory features"
+      ],
+      "phenotypes": []
+    },
+    "OR52E1": {
+      "pathways": [
+        "Olfactory Signaling Pathway"
+      ],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "OR4X1": {
+      "pathways": [
+        "Olfactory Signaling Pathway"
+      ],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "OR5AL1": {
+      "pathways": [
+        "Olfactory Signaling Pathway"
+      ],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "OR5AR1": {
+      "pathways": [
+        "Olfactory Signaling Pathway"
+      ],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "SLC22A24": {
+      "pathways": [],
+      "diseases": [
+        "acute kidney failure"
+      ],
+      "phenotypes": []
+    },
+    "SLC22A10": {
+      "pathways": [],
+      "diseases": [
+        "glioma susceptibility",
+        "malignant non-dysgerminomatous germ cell tumor of ovary",
+        "non-small cell lung carcinoma (disease)",
+        "malignant germ cell tumor of ovary",
+        "hereditary site-specific ovarian cancer syndrome",
+        "primary non-gestational choriocarcinoma of ovary",
+        "borderline epithelial tumor of ovary",
+        "hereditary breast ovarian cancer syndrome",
+        "giant cell glioblastoma",
+        "theca steroid-producing cell malignant tumor of ovary, not further specified",
+        "lung cancer",
+        "ovarian carcinosarcoma",
+        "ovarian small cell carcinoma",
+        "yolk sac tumor",
+        "glioblastoma (disease)",
+        "ovarian neoplasm",
+        "immature ovarian teratoma",
+        "adenocarcinoma of liver and intrahepatic biliary tract",
+        "ovarian endometrioid adenocarcinoma",
+        "ovarian mucinous adenocarcinoma",
+        "maligant granulosa cell tumor of ovary",
+        "malignant Sertoli-Leydig cell tumor of ovary",
+        "undifferentiated carcinoma of liver and intrahepatic biliary tract",
+        "fibrolamellar hepatocellular carcinoma",
+        "malignant sex cord stromal tumor of ovary",
+        "familial ovarian cancer",
+        "ovarian adenocarcinoma",
+        "squamous cell carcinoma of liver and intrahepatic biliary tract",
+        "ovarian clear cell adenocarcinoma",
+        "malignant dysgerminomatous germ cell tumor of ovary",
+        "hepatocellular carcinoma",
+        "pediatric hepatocellular carcinoma",
+        "liver cancer",
+        "ovarian cancer"
+      ],
+      "phenotypes": []
+    },
+    "TRIM64B": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "SLC37A4": {
+      "pathways": [
+        "Gluconeogenesis",
+        "Glycogen storage disease type Ib (SLC37A4)"
+      ],
+      "diseases": [
+        "glycogen storage disease",
+        "galactosemia",
+        "cystinuria",
+        "glycogen storage disease due to glucose-6-phosphatase deficiency",
+        "G6PD deficiency"
+      ],
+      "phenotypes": []
+    },
+    "OR10D3": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "OR8G3P": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "PEX5": {
+      "pathways": [
+        "E3 ubiquitin ligases ubiquitinate target proteins",
+        "Peroxisomal protein import",
+        "Pexophagy"
+      ],
+      "diseases": [
+        "infantile Refsum disease",
+        "Zellweger syndrome",
+        "chondrodysplasia punctata",
+        "peroxisome biogenesis disorder",
+        "neonatal adrenoleukodystrophy"
+      ],
+      "phenotypes": []
+    },
+    "MUC19": {
+      "pathways": [
+        "O-linked glycosylation of mucins",
+        "Defective GALNT12 causes colorectal cancer 1 (CRCS1)",
+        "Defective GALNT3 causes familial hyperphosphatemic tumoral calcinosis (HFTC)",
+        "Defective C1GALT1C1 causes Tn polyagglutination syndrome (TNPS)",
+        "Dectin-2 family",
+        "Termination of O-glycan biosynthesis"
+      ],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "OR6C1": {
+      "pathways": [
+        "Olfactory Signaling Pathway"
+      ],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "OR4K3": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "OR11H7": {
+      "pathways": [
+        "Olfactory Signaling Pathway"
+      ],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "GPR33": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "SERPINA2": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "ZNF598": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "RBBP6": {
+      "pathways": [
+        "RHOBTB1 GTPase cycle",
+        "Antigen processing: Ubiquitination & Proteasome degradation"
+      ],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "KRBOX5": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "PKD1L2": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "ZFPM1": {
+      "pathways": [
+        "RUNX1 regulates genes involved in megakaryocyte differentiation and platelet function",
+        "Factors involved in megakaryocyte development and platelet production"
+      ],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "KRTAP4-8": {
+      "pathways": [
+        "Keratinization"
+      ],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "SETBP1": {
+      "pathways": [],
+      "diseases": [
+        "undifferentiated carcinoma of the corpus uteri",
+        "chronic myelogenous leukemia, BCR-ABL1 positive",
+        "myelomonocytic leukemia",
+        "acute myeloid leukemia with t(8;21)(q22;q22) translocation",
+        "squamous cell carcinoma of the corpus uteri",
+        "acute myeloid leukemia with minimal differentiation",
+        "Schinzel-Giedion syndrome",
+        "acute myeloid leukemia with t(6;9)(p23;q34)",
+        "monocytic leukemia",
+        "inherited acute myeloid leukemia",
+        "hereditary breast ovarian cancer syndrome",
+        "auditory perceptual disorders",
+        "acute lymphoblastic leukemia (disease)",
+        "breast neoplasm",
+        "acute myeloid leukemia and myelodysplastic syndromes related to topoisomerase type 2 inhibitor",
+        "colorectal cancer",
+        "acute myeloid leukemia with CEBPA somatic mutations",
+        "acute myeloid leukemia with NPM1 somatic mutations",
+        "acute myeloid leukemia with inv3(p21;q26.2) or t(3;3)(p21;q26.2)",
+        "acute myeloblastic leukemia without maturation",
+        "breast carcinoma",
+        "atypical chronic myeloid leukemia, BCR-ABL1 negative",
+        "myeloid leukemia",
+        "atypical chronic myeloid leukemia",
+        "hereditary breast carcinoma",
+        "unclassified acute myeloid leukemia",
+        "acute myeloid leukemia with t(8;16)(p11;p13) translocation",
+        "acute myeloblastic leukemia with maturation",
+        "colorectal carcinoma",
+        "acute myeloid leukemia with t(9;11)(p22;q23)",
+        "intellectual disability",
+        "colorectal neoplasm",
+        "intellectual disability, autosomal dominant",
+        "therapy related acute myeloid leukemia and myelodysplastic syndrome",
+        "breast cancer",
+        "dysembryoplastic neuroepithelial tumor"
+      ],
+      "phenotypes": []
+    },
+    "SERPINB11": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "FCGBP": {
+      "pathways": [],
+      "diseases": [
+        "gastric carcinoma",
+        "diffuse gastric adenocarcinoma",
+        "gastric neoplasm",
+        "gastric cancer",
+        "gastric linitis plastica"
+      ],
+      "phenotypes": []
+    },
+    "PSG7": {
+      "pathways": [
+        "Cell surface interactions at the vascular wall"
+      ],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "FUT2": {
+      "pathways": [
+        "ABO blood group biosynthesis",
+        "Lewis blood group biosynthesis"
+      ],
+      "diseases": [
+        "ileocolitis",
+        "Crohn disease",
+        "Crohn ileitis and jejunitis",
+        "inflammatory bowel disease",
+        "Crohn's colitis"
+      ],
+      "phenotypes": []
+    },
+    "DEFB126": {
+      "pathways": [
+        "Beta defensins",
+        "Defensins"
+      ],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "GNRH2": {
+      "pathways": [
+        "Hormone ligand-binding receptors",
+        "G alpha (q) signalling events"
+      ],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "KIZ": {
+      "pathways": [],
+      "diseases": [
+        "retinitis pigmentosa"
+      ],
+      "phenotypes": []
+    },
+    "KRTAP19-6": {
+      "pathways": [
+        "Keratinization"
+      ],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "GAB4": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "IGLV5-48": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "IGLV3-16": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "APOL4": {
+      "pathways": [],
+      "diseases": [
+        "schizophrenia"
+      ],
+      "phenotypes": []
+    },
+    "WWC3": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "SUPT20HL1": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "NUDT11": {
+      "pathways": [
+        "Synthesis of pyrophosphates in the cytosol"
+      ],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "MAGEE2": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "LOC101928508": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "TCEAL6": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    },
+    "H2BW2": {
+      "pathways": [],
+      "diseases": [],
+      "phenotypes": []
+    }
+  }
+}

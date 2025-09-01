@@ -3,52 +3,54 @@ import networkx as nx
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import pandas as pd
+from collections import defaultdict
 
-def load_json(json_path):
-    """加载JSON文件"""
-    with open(json_path, 'r') as f:
+def load_json(INPUT):
+    """load JSON from previous step"""
+    with open(INPUT, 'r') as f:
         data = json.load(f)
     return data
 
 def build_network_graph(data):
-    """构建NetworkX图"""
+    """construct networkX graph"""
     G = nx.Graph()
     
-    # 添加基因节点
+    # add nodes
     genes = data.get('genes', [])
     for gene in genes:
         G.add_node(gene, type='gene', size=10)
     
-    # 调试：打印JSON结构
     # print("Common Pathways:", data.get('common_pathways', []))
     # print("Common Diseases:", data.get('common_diseases', []))
     # print("Common Phenotypes:", data.get('common_phenotypes', []))
+    # print("Details:", data.get('details', {}))
     
-    # 添加路径节点和边
+    # add nodes and edges
     for pathway in data.get('common_pathways', []):
         if isinstance(pathway, dict) and 'name' in pathway:
             name = pathway['name']
             associated_genes = pathway.get('associated_genes', [])
-            size = 15 + 5 * len(associated_genes)  # Size based on gene count
+            size = 15 + 5 * len(associated_genes)
             G.add_node(name, type='pathway', size=size, gene_count=len(associated_genes))
             for gene in associated_genes:
                 G.add_edge(gene, name)
         else:
             print(f"Skipping invalid pathway: {pathway}")
     
-    # 添加疾病节点和边
-    for disease in data.get('common_diseases', []):
-        if isinstance(disease, dict) and 'name' in disease:
-            name = disease['name']
-            associated_genes = disease.get('associated_genes', [])
-            size = 15 + 5 * len(associated_genes)
-            G.add_node(name, type='disease', size=size, gene_count=len(associated_genes))
-            for gene in associated_genes:
-                G.add_edge(gene, name)
-        else:
-            print(f"Skipping invalid disease: {disease}")
+    # add disease 
+    disease_genes = defaultdict(set)
+    for gene in data.get('details', {}):
+        diseases = data['details'][gene].get('diseases', [])
+        for disease in diseases:
+            if isinstance(disease, str):
+                disease_genes[disease].add(gene)
+                size = 15 + 5 * len(disease_genes[disease])
+                G.add_node(disease, type='disease', size=size, gene_count=len(disease_genes[disease]))
+                G.add_edge(gene, disease)
+            else:
+                print(f"Skipping invalid disease for {gene}: {disease}")
     
-    # 添加表型节点和边
+    # add phenotype
     for phenotype in data.get('common_phenotypes', []):
         if isinstance(phenotype, dict) and 'name' in phenotype:
             name = phenotype['name']
@@ -63,7 +65,7 @@ def build_network_graph(data):
     return G
 
 def plot_network_graph(G, output_html='network_graph.html'):
-    """使用Plotly绘制交互式网络图"""
+    """interactive plot with Plotly """
     pos = nx.spring_layout(G)
     
     edge_x = []
@@ -117,7 +119,7 @@ def plot_network_graph(G, output_html='network_graph.html'):
     
     fig = go.Figure(data=[edge_trace, node_trace],
                     layout=go.Layout(
-                        title='Gene-Pathway-Disease-Phenotype Network',
+                        title='Gene-Pathway-Disease-Phenotype Network (All Diseases)',
                         showlegend=False,
                         hovermode='closest',
                         margin=dict(b=20, l=5, r=5, t=40),
@@ -129,14 +131,20 @@ def plot_network_graph(G, output_html='network_graph.html'):
     print(f"Network graph saved as {output_html}")
 
 def plot_bar_chart(data, output_png='importance_bar.png'):
-    """绘制柱状图展示基因覆盖度"""
+    """barplot"""
     items = []
+
     for p in data.get('common_pathways', []):
         if isinstance(p, dict) and 'name' in p:
             items.append({'name': p['name'], 'type': 'pathway', 'gene_count': len(p.get('associated_genes', []))})
-    for d in data.get('common_diseases', []):
-        if isinstance(d, dict) and 'name' in d:
-            items.append({'name': d['name'], 'type': 'disease', 'gene_count': len(d.get('associated_genes', []))})
+
+    disease_genes = defaultdict(set)
+    for gene in data.get('details', {}):
+        for d in data['details'][gene].get('diseases', []):
+            if isinstance(d, str):
+                disease_genes[d].add(gene)
+                items.append({'name': d, 'type': 'disease', 'gene_count': len(disease_genes[d])})
+
     for ph in data.get('common_phenotypes', []):
         if isinstance(ph, dict) and 'name' in ph:
             items.append({'name': ph['name'], 'type': 'phenotype', 'gene_count': len(ph.get('associated_genes', []))})
@@ -153,7 +161,7 @@ def plot_bar_chart(data, output_png='importance_bar.png'):
     plt.bar(df['name'], df['gene_count'], color=colors)
     plt.xlabel('Pathway/Disease/Phenotype')
     plt.ylabel('Gene Count')
-    plt.title('Gene Coverage by Pathway, Disease, and Phenotype')
+    plt.title('Gene Coverage by Pathway, Disease, and Phenotype (All Diseases)')
     plt.xticks(rotation=45, ha='right')
     plt.tight_layout()
     
@@ -162,20 +170,14 @@ def plot_bar_chart(data, output_png='importance_bar.png'):
     print(f"Bar chart saved as {output_png}")
 
 def plot_graph():
-    # JSON文件路径
-    json_path = "gene_associations.json"
+    data = load_json("results/gene_associations.json")
     
-    # 加载JSON数据
-    data = load_json(json_path)
-    
-    # 构建网络图
     G = build_network_graph(data)
+
+    plot_network_graph(G, output_html="results/network_graph.html")
     
-    # 绘制交互式网络图
-    plot_network_graph(G, output_html='network_graph.html')
-    
-    # 绘制柱状图
     # plot_bar_chart(data, output_png='importance_bar.png')
 
 if __name__ == "__main__":
+
     plot_graph()
