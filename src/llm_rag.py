@@ -23,17 +23,21 @@ def read_gene_list(gene_file="../gene_list.txt"):
         print(f"❌ Error reading gene list: {e}")
         return []
 
-def load_pubmed_context(pubmed_file="../results/pubmed_response.txt"):
-    """Load PubMed literature context to prevent hallucinations"""
+def load_pubmed_context_for_gene(gene_name):
+    """Load PubMed literature context for specific gene to prevent hallucinations"""
+    results_dir = Path("../results")
+    pubmed_file = results_dir / f"{gene_name.lower()}_pubmed_response.txt"
+    
     try:
         with open(pubmed_file, "r", encoding="utf-8") as f:
             content = f.read()
+        print(f"📚 Loaded PubMed context for {gene_name}: {len(content)} characters")
         return content
     except FileNotFoundError:
-        print(f"⚠️ PubMed file not found: {pubmed_file}")
+        print(f"⚠️ PubMed file not found for {gene_name}: {pubmed_file}")
         return ""
     except Exception as e:
-        print(f"⚠️ Error reading PubMed file: {e}")
+        print(f"⚠️ Error reading PubMed file for {gene_name}: {e}")
         return ""
 
 def analyze_gene_with_rag(gene_name, pubmed_context=""):
@@ -210,13 +214,9 @@ def main():
         print("❌ No genes to analyze")
         return
     
-    # Load PubMed context
-    pubmed_context = load_pubmed_context()
-    
     print(f"📋 Found {len(genes)} genes to analyze: {', '.join(genes)}")
-    print(f"📚 PubMed context: {'Available' if pubmed_context else 'Not available'}")
     
-    # Analyze each gene
+    # Analyze each gene with its specific PubMed context
     results = []
     for i, gene in enumerate(genes, 1):
         print(f"\n{'='*60}")
@@ -224,6 +224,10 @@ def main():
         print(f"{'='*60}")
         
         try:
+            # Load gene-specific PubMed context
+            pubmed_context = load_pubmed_context_for_gene(gene)
+            
+            # Analyze with gene-specific context
             result = analyze_gene_with_rag(gene, pubmed_context)
             results.append(result)
             

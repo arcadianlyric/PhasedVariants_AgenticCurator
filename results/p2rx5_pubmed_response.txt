@@ -1,0 +1,292 @@
+# PubMed Search Results for: P2RX5
+# Found 5 articles
+# ==================================================
+
+1. Ann Endocrinol (Paris). 2025 Sep 10:102456. doi: 10.1016/j.ando.2025.102456. 
+Online ahead of print.
+
+Analysis of genetic predisposition to familial non-medullary thyroid cancer by 
+whole genome sequencing.
+
+Cao CD(1), Desailloud R(2), Topolinski H(3), Crépin M(4), Flament C(4), 
+Leteurtre E(5), Cardot-Bauters C(1), Frénois F(6), Ait-Yahya É(7), Bonte F(7), 
+Leclerc J(8), Pigny P(9).
+
+Author information:
+(1)CHU Lille, Service d'Endocrinologie et Métabolisme, F-59037 Lille, France.
+(2)CHU Amiens, Service d'Endocrinologie et Métabolisme, F-80054 Amiens, France.
+(3)CH Béthune, Service Endocrinologie Diabétologie, F-62408 Béthune, France.
+(4)CHU Lille, Service de Biochimie, "Hormonologie, Métabolisme, Nutrition et 
+Oncologie", F-59037 Lille, France.
+(5)Univ. Lille, CNRS, Inserm, CHU Lille, UMR9020-U1277-CANTHER-Cancer 
+Heterogeneity Plasticity and Resistance to Therapies, F-59000 Lille, France.
+(6)CHU Lille, Faculté de Médecine ULR 7364 Équipe RADEME, F-59037 Lille, France.
+(7)CHU Lille, Équipe Bio-Informatique, F-59037 Lille, France.
+(8)CHU Lille, Service de Biochimie, "Hormonologie, Métabolisme, Nutrition et 
+Oncologie", F-59037 Lille, France; Univ. Lille, CNRS, Inserm, CHU Lille, 
+UMR9020-U1277 - CANTHER - Cancer Heterogeneity Plasticity and Resistance to 
+Therapies, F-59000 Lille, France.
+(9)CHU Lille, Service de Biochimie, "Hormonologie, Métabolisme, Nutrition et 
+Oncologie", F-59037 Lille, France; Univ. Lille, CNRS, Inserm, CHU Lille, 
+UMR9020-U1277 - CANTHER - Cancer Heterogeneity Plasticity and Resistance to 
+Therapies, F-59000 Lille, France. Electronic address: pascal.pigny@chu-lille.fr.
+
+BACKGROUND: Several putative susceptibility genes for familial papillary thyroid 
+carcinoma, or familial non-medullary thyroid carcinoma (FNMTC), have been 
+identified. However, in most families the molecular basis for FNMTC remains 
+elusive.
+METHODS: Two families with ≥ 3 first-degree relatives in ≥ 2 generations and ≥ 2 
+unaffected relatives were selected. Germline DNA from 2 patients and 2 
+unaffected individuals per family were analyzed by whole genome sequencing. All 
+individuals were genotyped for putative pathogenic variants by Sanger 
+sequencing, and minor allele frequency (MAF) was determined in 179 PTC-free 
+European controls and the GnomAD data base. Methylation analysis of candidate 
+genes was carried out by EPIC BeadChips or pyrosequencing on germline and 
+tumoral DNA.
+RESULTS: Heterozygous variants in cancer-related genes expressed in thyroid 
+tissue and predicted to impact protein function were identified in patients from 
+both families. In F8, the best candidate was the P2RX5 p.Leu32Gln variant 
+previously reported in another PTC family. However, its relatively high MAF in 
+European controls (0.43%) casts doubt on its pathogenic role. In F17, the most 
+relevant variant was c.345del in MST1R encoding the tyrosine kinase receptor 
+RON. The variant is predicted to encode a truncated isoform. Further analysis of 
+tumor and germline DNA showed no clear evidence of an expression switch from the 
+long to the short oncogenic RON isoform.
+CONCLUSION: Our data provide novel insight on the genetics of FNMTC. The P2RX5 
+p.Leu32Gln variant should be considered either as low-penetrant or not 
+associated with PTC predisposition. MST1R appears as a new putative 
+susceptibility gene for FNMTC that warrants further consideration.
+
+Copyright © 2025 The Author(s). Published by Elsevier Masson SAS.. All rights 
+reserved.
+
+DOI: 10.1016/j.ando.2025.102456
+PMID: 40939960
+
+
+2. Int J Mol Sci. 2025 Jul 4;26(13):6474. doi: 10.3390/ijms26136474.
+
+The Purinergic Receptor P2X5 Modulates Glucose Metabolism and Expression of 
+Thermogenic Genes in Brown Adipose Tissue.
+
+Jaeckstein MY(1), Miegel L(1), Behrens J(1), Stähler T(2), Diercks BP(1), Heine 
+M(1), Koch-Nolte F(2), Heeren J(1).
+
+Author information:
+(1)Department of Biochemistry and Molecular Cell Biology, University Medical 
+Center Hamburg-Eppendorf, 20246 Hamburg, Germany.
+(2)Institute of Immunology, University Medical Center Hamburg-Eppendorf, 20246 
+Hamburg, Germany.
+
+Next to adrenergic signalling, purinergic pathways mediated by extracellular 
+adenine nucleotides have been described to shape thermogenic and metabolic 
+functions in brown adipose tissue (BAT). Here we describe high expression of 
+P2X5 that is activated by ATP in mature adipocytes of BAT and differentiated 
+brown adipocytes in vitro. The levels of other P2X family members were much 
+lower, or expression was restricted to tissue-resident macrophages or 
+endothelial cells. Global and brown adipocyte-specific P2rx5 deficiency resulted 
+in lower expression of the uncoupling protein 1 (UCP1). However, indirect 
+calorimetry studies showed that P2X5 did not affect systemic energy expenditure. 
+Of note, glucose tolerance was impaired under chow and obesogenic high-fat diet 
+conditions, which can be explained by lower glucose disposal into BAT but not 
+into other organs. In summary, these data indicate a modulatory role of P2X5 in 
+systemic and BAT-specific glucose metabolism.
+
+DOI: 10.3390/ijms26136474
+PMCID: PMC12249994
+PMID: 40650249 [Indexed for MEDLINE]
+
+Conflict of interest statement: The authors declare no conflicts of interest. 
+The funders had no role in the design of the study; in the collection, analyses, 
+or interpretation of data; in the writing of the manuscript; or in the decision 
+to publish the results.
+
+
+3. BMC Neurol. 2025 Jul 1;25(1):261. doi: 10.1186/s12883-025-04231-3.
+
+A novel gene signature for forecasting time to next relapse in multiple 
+sclerosis using peripheral blood mononuclear cells.
+
+Zhang H(1), Yang J(2), Zhang X(3), Wu C(1), Zhao Z(2), Yang M(4), Wu Z(5).
+
+Author information:
+(1)Department of Neurology, The First People's Hospital of Lin'an District, 
+Hangzhou, Zhejiang, 311300, China.
+(2)Department of Neurology, The Affiliated Zhuzhou Hospital Xiangya Medical 
+College CSU, Zhuzhou, Hunan, 412007, China.
+(3)Department of Neurology, First People's Hospital of Changde City, Changde, 
+Hunan, 415003, China.
+(4)Department of Neurology, The Quzhou Affiliated Hospital of Wenzhou Medical 
+University, No. 100 Minjiang Avenue, Kecheng District, Quzhou, Zhejiang, 324002, 
+China.
+(5)Department of Neurology, The Quzhou Affiliated Hospital of Wenzhou Medical 
+University, No. 100 Minjiang Avenue, Kecheng District, Quzhou, Zhejiang, 324002, 
+China. wuzhaopinghde@outlook.com.
+
+AIM: The purpose of this research study was to develop and validate a gene 
+signature based on peripheral blood mononuclear cells (PBMCs) for predicting the 
+time to the next relapse in multiple sclerosis (MS).
+METHODS: The GSE15245 dataset (N = 94) was divided into a training set (N = 65) 
+and a testing set (N = 29). First, the training set was analyzed using weighted 
+gene co-expression network analysis (WGCNA) to identify key modules that were 
+highly correlated with the timing of the next acute relapse. Subsequently, the 
+hub genes within these key modules were subjected to univariate Cox regression 
+analysis, and genes related to the recurrence time of MS were identified. The 
+least absolute shrinkage and selection operator (LASSO) Cox regression was used 
+to refine the extraction further. Then, the gene signatures were constructed 
+using multivariate Cox regression. The efficacy of the model that was based on 
+the training set database was evaluated using receiver operating characteristic 
+(ROC) curves and validated using an independent testing set. Additionally, gene 
+signatures were also validated for differential expression using an external 
+independent dataset, GSE21942 (N = 29), along with experimental verification.
+RESULT: Two key modules were identified with WGCNA. Univariate Cox regression 
+analysis yielded 30 genes related to the relapse time of MS from these two 
+modules, and then LASSO regression analysis further refined the selection to 
+four genes, namely, BLK, P2RX5, GP1BA, and PF4. These four genes were used 
+within the training dataset to build a Cox regression model, and this showed 
+high prediction performance in the training as well as the testing datasets. 
+Both external dataset analysis and experimental validation corroborated the 
+differential expression of BLK and P2RX5 in patients with MS.
+CONCLUSION: BLK, P2RX5, GP1BA, and PF4 emerge as potential predictors of future 
+disease activity in individuals with MS.
+
+© 2025. The Author(s).
+
+DOI: 10.1186/s12883-025-04231-3
+PMCID: PMC12210466
+PMID: 40597893 [Indexed for MEDLINE]
+
+Conflict of interest statement: Declarations. Ethics approval and consent to 
+participate: This study protocol was approved by the Ethics Committee of Zhuzhou 
+Central Hospital (approval number: ZZCHEC2000044-01). This study was conducted 
+in accordance with the declaration of Helsinki. Written informed consent was 
+obtained from all participants. Consent for publication: Not applicable. 
+Competing interests: The authors declare no competing interests.
+
+
+4. Poult Sci. 2025 Jul;104(7):105245. doi: 10.1016/j.psj.2025.105245. Epub 2025
+May  1.
+
+Indigenous broilers in crossbreeding: impacts on meat quality and candidate gene 
+screening.
+
+Li J(1), Zhou Z(1), Zhang Z(1), Zheng X(1), Sun Y(1), Guo S(1), Li Y(1), Yang 
+X(1), Kong S(1), Cai D(1), Lin D(1), Mo Y(1), Cai B(1), Nie Q(2).
+
+Author information:
+(1)State Key Laboratory of Livestock and Poultry Breeding, Guangdong Laboratory 
+for Lingnan Modern Agriculture, College of Animal Science, South China 
+Agricultural University, Guangzhou, PR China; Guangdong Provincial Key Lab of 
+Agro-Animal Genomics and Molecular Breeding, Key Laboratory of Chicken Genetics, 
+Breeding and Reproduction, Ministry of Agriculture and Rural Affairs, 
+National-Local Joint Engineering Research Center for Livestock Breeding, 
+Guangzhou, PR China.
+(2)State Key Laboratory of Livestock and Poultry Breeding, Guangdong Laboratory 
+for Lingnan Modern Agriculture, College of Animal Science, South China 
+Agricultural University, Guangzhou, PR China; Guangdong Provincial Key Lab of 
+Agro-Animal Genomics and Molecular Breeding, Key Laboratory of Chicken Genetics, 
+Breeding and Reproduction, Ministry of Agriculture and Rural Affairs, 
+National-Local Joint Engineering Research Center for Livestock Breeding, 
+Guangzhou, PR China. Electronic address: nqinghua@scau.edu.cn.
+
+In the fierce market competition, high-quality chicken products often stand out. 
+There are significant differences in meat quality between yellow and white 
+feathered chickens. However, the underlying mechanisms that lead to the 
+differences in their meat quality remain unclear. Single nucleotide 
+polymorphisms (SNP) are effective molecular markers that can be utilized in 
+marker-assisted breeding programs targeting chicken meat quality traits. Our 
+research findings indicated that the bloodline of yellow-feathered chickens can 
+significantly alter the meat quality traits of chickens, especially in terms of 
+the shear force and meat color of the breast muscle. Additionally, through 
+metabolomic, lipidomic, and RNA-seq, we identified differentially expressed 
+metabolites, lipids, and genes that influence meat quality. Furthermore, we 
+discovered a key gene, the purinergic receptor P2 × 5 (P2RX5), which 
+significantly contributes to meat quality traits. We identified five SNP sites 
+within the P2RX5 gene and conducted genotyping. Three of these SNP sites were 
+found to be significantly associated with meat quality traits in chickens, such 
+as the a*value and cooking loss. These results indicated that our findings 
+provide potential molecular markers for changing meat quality traits in 
+chickens. However, due to our small sample size and the absence of testing on 
+males, the generalizability of the results may be insufficient.
+
+Copyright © 2025. Published by Elsevier Inc.
+
+DOI: 10.1016/j.psj.2025.105245
+PMCID: PMC12138444
+PMID: 40344706 [Indexed for MEDLINE]
+
+Conflict of interest statement: Declaration of competing interest All authors 
+declared that they have no conflicts of interest to this work.
+
+
+5. Prostate Cancer Prostatic Dis. 2025 Sep;28(3):773-781. doi: 
+10.1038/s41391-024-00918-9. Epub 2024 Nov 14.
+
+Enhancing risk stratification models in localized prostate cancer by novel 
+validated tissue biomarkers.
+
+Olah C(1), Mairinger F(2), Wessolly M(2), Joniau S(3), Spahn M(1)(4), 
+Kruithof-de Julio M(5)(6), Hadaschik B(1), Soós A(7), Nyirády P(7), Győrffy 
+B(8)(9), Reis H(#)(2)(10), Szarvas T(#)(11)(12).
+
+Author information:
+(1)Department of Urology, University of Duisburg-Essen, Essen, Germany.
+(2)Institute of Pathology, University Medicine Essen, University of 
+Duisburg-Essen, Essen, Germany.
+(3)Department of Urology, University Hospitals Leuven, Leuven, Belgium.
+(4)Lindenhofspital, Bern, Switzerland.
+(5)Urology Research Laboratory, Department for BioMedical Research, University 
+of Bern, Bern, Switzerland.
+(6)Department of Urology, Inselspital, Bern University Hospital, University of 
+Bern, Bern, Switzerland.
+(7)Department of Urology, Semmelweis University, Budapest, Hungary.
+(8)Research Centre for Natural Sciences, Cancer Biomarker Research Group, 
+Institute of Enzymology, Budapest, Hungary.
+(9)Department of Bioinformatics, Semmelweis University, Budapest, Hungary.
+(10)Dr. Senckenberg Institute of Pathology, University Hospital Frankfurt, 
+Goethe University Frankfurt, Frankfurt am Main, Germany.
+(11)Department of Urology, University of Duisburg-Essen, Essen, Germany. 
+tibor.szarvas@uk-essen.de.
+(12)Department of Urology, Semmelweis University, Budapest, Hungary. 
+tibor.szarvas@uk-essen.de.
+(#)Contributed equally
+
+BACKGROUND: Localized prostate cancer (PCa) is a largely heterogeneous disease 
+regarding its clinical behavior. Current risk stratification relies on 
+clinicopathological parameters and distinguishing between indolent and 
+aggressive cases remains challenging. To improve risk stratification, we aimed 
+to identify new prognostic markers for PCa.
+METHODS: We performed an in silico analysis on publicly available PCa 
+transcriptome datasets. The top 20 prognostic genes were assessed in PCa tissue 
+samples of our institutional cohort (n = 92) using the NanoString nCounter 
+technology. The three most promising candidates were further assessed by 
+immunohistochemistry (IHC) in an institutional (n = 121) and an independent 
+validation cohort from the EMPACT consortium (n = 199). Cancer-specific survival 
+(CSS) and progression-free survival (PFS) were used as endpoints.
+RESULTS: Our in silico analysis identified 113 prognostic genes. The prognostic 
+values of seven of the top 20 genes were confirmed in our institutional radical 
+prostatectomy (RPE) cohort. Low CENPO, P2RX5, ABCC5 as well as high ASF1B, 
+NCAPH, UBE2C, and ZWINT gene expressions were associated with shorter CSS. IHC 
+analysis confirmed the significant associations between NCAPH and UBE2C staining 
+and worse CSS. In the external validation cohort, higher NCAPH and ZWINT protein 
+expressions were associated with shorter PFS. The combination of the newly 
+identified tissue protein markers improved standard risk stratification models, 
+such as D'Amico, CAPRA, and Cambridge prognostic groups.
+CONCLUSIONS: We identified and validated high tissue levels of NCAPH, UBE2C, and 
+ZWINT as novel prognostic risk factors in clinically localized PCa patients. The 
+use of these markers can improve routinely used risk estimation models.
+
+© 2024. The Author(s).
+
+DOI: 10.1038/s41391-024-00918-9
+PMCID: PMC12399428
+PMID: 39543244 [Indexed for MEDLINE]
+
+Conflict of interest statement: Competing interests: BH: Advisory boards for 
+Janssen, Bayer, ABX, Lightpoint, Amgen, MSD, Pfizer, Novartis. Invited speaker 
+for Accord, Astellas, Janssen R&D. Honoraria from Uromed. Research funding from 
+AAA/Novartis, Bristol Myers Squibb, and German Research Foundation. Leadership 
+roles for DKG AUO and DGU. The authors declare no potential conflicts of 
+interest with the present project and publication. Ethics: The study was 
+performed in compliance with the Declaration of Helsinki and the institutional 
+ethics committees approved the study protocol (21-9991-BO and KEK-BE128/2015).
