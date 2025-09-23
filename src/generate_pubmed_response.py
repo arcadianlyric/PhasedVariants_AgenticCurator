@@ -40,7 +40,7 @@ def fetch_abstracts(pmids, max_retries=3):
                 print(f"❌ Failed to fetch abstracts after {max_retries} attempts")
                 return f"Error fetching abstracts: {e}"
 
-def generate_pubmed_response(keywords, output_file="pubmed_response.txt", max_results=10):
+def generate_pubmed_response(keywords, output_file="../results/pubmed_response.txt", max_results=10):
     """
     Generate pubmed_response.txt file
     
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     gene_files = []
     for gene in genes:
         print(f"\n=== Searching {gene} ===")
-        output_file = f"{gene.lower()}_pubmed_response.txt"
+        output_file = f"../results/{gene.lower()}_pubmed_response.txt"
         generate_pubmed_response(gene, output_file, max_results=5)
         gene_files.append((gene, output_file))
         # Add delay between requests to be respectful to PubMed servers
@@ -108,7 +108,7 @@ if __name__ == "__main__":
     
     # Merge results into one file
     try:
-        with open("pubmed_response.txt", "w", encoding="utf-8") as combined:
+        with open("../results/pubmed_response.txt", "w", encoding="utf-8") as combined:
             combined.write(f"# Combined PubMed Results: {', '.join(genes)}\n")
             combined.write("# " + "="*60 + "\n\n")
             
