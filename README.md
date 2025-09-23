@@ -44,8 +44,8 @@ This project implements an **Agentic AI System** for automated genetic variant i
 
 **2. Multi-Modal Reasoning**
 - **Knowledge Graph Integration**: Leverages PrimeKG to understand gene-disease-pathway relationships
-- **Literature Synthesis**: Processes PubMed abstracts to ground analysis in current research
-(- **Variant Impact Assessment**: Combines structural, functional, and clinical evidence)
+- **Literature Synthesis**: Processes PubMed abstracts to ground analysis in current research  
+- **Variant Impact Assessment**: Combines structural, functional, and clinical evidence (on going)    
 
 **3. RAG-Enhanced Intelligence**
 - **Retrieval-Augmented Generation**: Prevents hallucinations by grounding LLM responses in scientific literature
@@ -60,7 +60,7 @@ This project implements an **Agentic AI System** for automated genetic variant i
 **5. Tool Integration & Orchestration**
 - **API Management**: Coordinates between PubMed, DeepSeek, and local knowledge bases
 - **File I/O Automation**: Manages complex data pipelines without manual intervention
-- **Report Generation**: Produces structured JSON and human-readable Markdown outputs
+- **Report Generation**: Produces structured JSON and human-readable Markdown outputs (on going)  
 
 #### 🧠 Agent Workflow
 ![Flowchart](docs/flowchart.png)
@@ -70,7 +70,7 @@ This project implements an **Agentic AI System** for automated genetic variant i
 - **Knowledge Graph Agent**: Maps genes to disease networks and pathways
 - **Literature Retrieval Agent**: Fetches relevant PubMed abstracts automatically
 - **Analysis Agent**: Performs RAG-enhanced genetic interpretation
-(- **Reporting Agent**: Generates structured clinical reports)
+- **Reporting Agent**: Generates structured clinical reports
 
 #### 🎯 Agentic Advantages
 
