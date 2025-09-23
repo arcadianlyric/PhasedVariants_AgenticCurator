@@ -5,9 +5,12 @@ Genomic phasing, the process of determining which genetic variants reside on the
 However, interpreting the results – detailed gene functions and variant impacts within the phased VCF – often requires significant manual interpretation by skilled variant curators to extract biological and clinical meaning. This process is time-consuming, limits throughput, and can vary between curators.  
 To automate this interpretation, building on the foundation of high-quality phased data, we have designed an agentic workflow aimed at addressing the above challenges.  
 
+### Keywords
+Agentic, LLM/RAG, Haplotype Phasing, Gene/Variant Curation, Knowledge Graph, Literature Retrieval    
+
 ### Results
-1. Explore phased VCF, get variants with VEP HIGH impact on both copies, get gene networks connected by diseases, phenotypes and pathways.  
-The main function in src/explore_phased_vcf.py:
+1. Explore phased VCF, get variants with VEP HIGH impact on both copies, get gene networks connected by diseases, phenotypes and pathways by querying knowledge graph.  
+
 ```
 vcf_file=data/HG002_exon.vep.vcf.gz
 kg_path=db/kg.csv
@@ -17,7 +20,7 @@ python explore_phased_vcf.py --vcf_file $vcf_file --kg_path $kg_path --ref_fai $
 ```
 Output variants with VEP HIGH impact on both copies. Such vairants are used to mine Knowledge Graph to get gene networks connected by diseases, phenotypes and pathways. There are 2 files in the ./results folder: network_graph.html and gene_associations.json. The [results/network_graph.html](results/network_graph.html) is a interactive visulization. ![network_graph](images/network_graph.jpg) 
 
-2. LLM RAG gene/variant curation agnet   
+2. LLM RAG gene/variant curation agnet querying PubMed literature.    
 Set genes of interest (selected from the gene network) in gene_list.txt.  
 Set PubMed API email in setting.json.  
 ```
