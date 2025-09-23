@@ -8,6 +8,7 @@ from Bio import Entrez
 import os
 import json
 import time
+from pathlib import Path
 # Set email (required by PubMed API)
 with open("../setting.json", "r") as f:
     settings = json.load(f)
@@ -40,6 +41,14 @@ def fetch_abstracts(pmids, max_retries=3):
                 print(f"❌ Failed to fetch abstracts after {max_retries} attempts")
                 return f"Error fetching abstracts: {e}"
 
+def ensure_results_directory():
+    """Ensure results directory exists"""
+    results_dir = Path("../results")
+    if not results_dir.exists():
+        results_dir.mkdir(parents=True, exist_ok=True)
+        print(f"✅ Created results directory: {results_dir.absolute()}")
+    return results_dir
+
 def generate_pubmed_response(keywords, output_file="../results/pubmed_response.txt", max_results=10):
     """
     Generate pubmed_response.txt file
@@ -50,6 +59,9 @@ def generate_pubmed_response(keywords, output_file="../results/pubmed_response.t
         max_results (int): Maximum number of results
     """
     print(f"🔍 Search keywords: {keywords}")
+    
+    # Ensure results directory exists
+    results_dir = ensure_results_directory()
     
     # Search literature
     pmids = search_pubmed(keywords, max_results)
@@ -87,6 +99,9 @@ def read_gene_list(gene_file="../gene_list.txt"):
         return []
 
 if __name__ == "__main__":
+    # Ensure results directory exists first
+    results_dir = ensure_results_directory()
+    
     # Read gene list from file
     genes = read_gene_list()
     
@@ -100,15 +115,16 @@ if __name__ == "__main__":
     gene_files = []
     for gene in genes:
         print(f"\n=== Searching {gene} ===")
-        output_file = f"../results/{gene.lower()}_pubmed_response.txt"
-        generate_pubmed_response(gene, output_file, max_results=5)
-        gene_files.append((gene, output_file))
+        output_file = results_dir / f"{gene.lower()}_pubmed_response.txt"
+        generate_pubmed_response(gene, str(output_file), max_results=5)
+        gene_files.append((gene, str(output_file)))
         # Add delay between requests to be respectful to PubMed servers
         time.sleep(1)
     
     # Merge results into one file
     try:
-        with open("../results/pubmed_response.txt", "w", encoding="utf-8") as combined:
+        combined_file = results_dir / "pubmed_response.txt"
+        with open(combined_file, "w", encoding="utf-8") as combined:
             combined.write(f"# Combined PubMed Results: {', '.join(genes)}\n")
             combined.write("# " + "="*60 + "\n\n")
             
@@ -119,7 +135,7 @@ if __name__ == "__main__":
                         combined.write(f.read())
                     combined.write("\n\n" + "="*60 + "\n\n")
         
-        print(f"\n✅ Combined file created: pubmed_response.txt")
+        print(f"\n✅ Combined file created: {combined_file}")
         print(f"📄 Total genes processed: {len(genes)}")
     except Exception as e:
         print(f"❌ Error creating combined file: {e}")
