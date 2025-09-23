@@ -31,7 +31,7 @@ python llm_queryAlone.py
 # Use pubmed_response.txt for RAG
 python llm_rag.py  
 ```
-Example output: ./results/p2rx5_rag_analysis.json.  
+Example output: [./results/p2rx5_rag_analysis.json](results/p2rx5_rag_analysis.json).  
 
 ### Agent Architecture
 
