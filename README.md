@@ -28,8 +28,11 @@ Set PubMed API email in setting.json.
 python generate_pubmed_response.py 
 # Query gene name with LLM alone 
 python llm_queryAlone.py 
+# Supply literature augmentation to LLM  
+python llm_augmented.py  
 # Use FAISS-powered RAG for grounded analysis
 python llm_rag.py  
+
 ```
 Example output: [./results/p2rx5_rag_analysis.json](results/p2rx5_rag_analysis.json).  
 
