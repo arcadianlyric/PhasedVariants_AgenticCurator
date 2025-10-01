@@ -22,7 +22,8 @@ Output variants with VEP HIGH impact on both copies. Such vairants are used to m
 
 2. LLM RAG gene/variant curation agent querying PubMed literature.    
 Set genes of interest (selected from the gene network) in gene_list.txt.  
-Set PubMed API email in setting.json.  
+Set PubMed API email in setting.json. 
+Set DeepSeek API key in api_key.   
 ```
 # Output PubMed abstracts to gene-specific files
 python generate_pubmed_response.py 
@@ -32,7 +33,6 @@ python llm_queryAlone.py
 python llm_augmented.py  
 # Use FAISS-powered RAG for grounded analysis
 python llm_rag.py  
-
 ```
 Example output: [./results/p2rx5_rag_analysis.json](results/p2rx5_rag_analysis.json).  
 
@@ -99,3 +99,8 @@ reads mapped with [Lariat](https://github.com/10XGenomics/lariat), a Linked-Read
 4. [ClinVar variant summary](https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/)  
 5. [PrimeKG](https://zitniklab.hms.harvard.edu/projects/PrimeKG/)  
 6. [livtover](http://hgdownload.cse.ucsc.edu/goldenPath/hg38/liftOver/), hg38ToHg19.over.chain.gz  
+7. [FAISS](https://github.com/facebookresearch/faiss)  
+8. [Langchain](https://github.com/hwchase17/langchain)  
+9. [DeepSeek](https://deepseek.com/)  
+10. [HuggingFace](https://huggingface.co/)  
+
