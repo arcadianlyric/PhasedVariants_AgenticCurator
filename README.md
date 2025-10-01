@@ -3,10 +3,10 @@
 ### Background  
 Genomic phasing, the process of determining which genetic variants reside on the same chromosome (haplotype), is critical for unraveling complex genetic scenarios, such as compound heterozygosity or the effects of cis-regulatory variants. The foundation of this process lies in generating highly accurate and comprehensive phased data. At Complete Genomics, we have developed a robust pipeline [cWGS](https://github.com/Complete-Genomics/DNBSEQ_Complete_WGS/tree/dev), which produces high-fidelity phased VCF files with DeepVariant and HapCUT2.  
 However, interpreting the results – detailed gene functions and variant impacts within the phased VCF – often requires significant manual interpretation by skilled variant curators to extract biological and clinical meaning. This process is time-consuming, limits throughput, and can vary between curators.  
-To automate this interpretation, building on the foundation of high-quality phased data, we have designed an agentic workflow aimed at addressing the above challenges, now enhanced with a Literature-augmented LLM Agent.  
+To automate this interpretation, building on the foundation of high-quality phased data, we have designed an agentic workflow aimed at addressing the above challenges, now enhanced with a RAG-Enhanced LLM Agent.  
 
 ### Keywords
-Agentic, LLM/Literature-Augmented, Haplotype Phasing, Gene/Variant Curation, Knowledge Graph, Literature Retrieval    
+Agentic, LLM, RAG/Langchain, FAISS, Haplotype Phasing, Gene/Variant Curation, Knowledge Graph, Literature Retrieval/Augmented      
 
 ### Results
 1. Explore phased VCF, get variants with VEP HIGH impact on both copies, get gene networks connected by diseases, phenotypes and pathways by querying knowledge graph.  
@@ -20,7 +20,7 @@ python explore_phased_vcf.py --vcf_file $vcf_file --kg_path $kg_path --ref_fai $
 ```
 Output variants with VEP HIGH impact on both copies. Such vairants are used to mine Knowledge Graph to get gene networks connected by diseases, phenotypes and pathways. There are 2 files in the ./results folder: network_graph.html and gene_associations.json. The [results/network_graph.html](results/network_graph.html) is a interactive visulization. ![network_graph](images/network_graph.jpg) 
 
-2. LLM literature-augmented gene/variant curation agent querying PubMed literature.    
+2. LLM RAG gene/variant curation agent querying PubMed literature.    
 Set genes of interest (selected from the gene network) in gene_list.txt.  
 Set PubMed API email in setting.json.  
 ```
@@ -28,64 +28,46 @@ Set PubMed API email in setting.json.
 python generate_pubmed_response.py 
 # Query gene name with LLM alone 
 python llm_queryAlone.py 
-# Use literature context for augmented analysis
+# Use FAISS-powered RAG for grounded analysis
 python llm_rag.py  
 ```
 Example output: [./results/p2rx5_rag_analysis.json](results/p2rx5_rag_analysis.json).  
 
 ### Agent Architecture
-
-This project implements an **Agentic AI System** for automated genetic variant interpretation, combining multiple AI capabilities to create an intelligent, autonomous workflow:
-
-#### 🤖 Core Agentic Properties
-
-**1. Autonomous Decision Making**
-- The system automatically selects relevant genes from phased VCF analysis
-- Dynamically prioritizes variants based on VEP impact scores and phasing information
-- Self-determines analysis depth based on available literature context
-
-**2. Multi-Modal Reasoning**
+{{ ... }}
 - **Knowledge Graph Integration**: Leverages PrimeKG to understand gene-disease-pathway relationships
-- **Literature Context:** Gene-specific PubMed abstracts from recent publications
-- **Existing Associations:** {len(existing_diseases)} known disease associations
-- **Analysis Method:** Literature-augmented to prevent hallucinations
+- **Vector Store**: A FAISS index built from gene-specific PubMed abstracts.
+- **Semantic Search**: Retrieves the most relevant text chunks for the LLM.
+- **Analysis Method**: True Retrieval-Augmented Generation to prevent hallucinations.
 
-**3. Literature-Augmented Intelligence**
-- **Context-Augmented Generation**: Prevents hallucinations by grounding LLM responses in scientific literature
-- **Gene-Specific Context**: Uses targeted literature for each gene to provide relevant background
-- **Evidence-Based Reasoning**: Only makes claims supported by provided scientific evidence
+**3. RAG-Enhanced Intelligence**
+- **Retrieval-Augmented Generation**: Implements a true RAG pipeline using FAISS to find the most relevant literature snippets, preventing hallucinations.
+- **Semantic Search**: Moves beyond simple context injection to perform semantic similarity searches on vectorized literature.
+- **Evidence-Based Reasoning**: Ensures LLM claims are strictly supported by the retrieved, most relevant scientific evidence.
 
 **4. Adaptive Workflow**
 - **Gene List Processing**: Automatically reads and processes multiple genes from configuration
 - **Error Recovery**: Continues analysis even when individual components fail
-- **Scalable Architecture**: Handles single genes or batch processing seamlessly
-
-**5. Tool Integration & Orchestration**
-- **API Management**: Coordinates between PubMed, DeepSeek, and local knowledge bases
-- **File I/O Automation**: Manages complex data pipelines without manual intervention
-- **Report Generation**: Produces structured JSON and human-readable Markdown outputs (on going)  
-
-#### 🧠 Agent Workflow
-![Flowchart](docs/flowchart.png)
+{{ ... }}
 
 **Agent Components:**
-- **Variant Curator Agent**: Identifies high-impact variants from phased data
-- **Knowledge Graph Agent**: Maps genes to disease networks and pathways
-- **Literature Retrieval Agent**: Fetches relevant PubMed abstracts automatically
-- **Analysis Agent**: Performs literature-augmented genetic interpretation
-- **Reporting Agent**: Generates structured clinical reports
+- **Variant Curator Agent**: Identifies high-impact variants from phased data.
+- **Knowledge Graph Agent**: Maps genes to disease networks and pathways.
+- **Literature Retrieval Agent**: Fetches relevant PubMed abstracts automatically.
+- **Vector Store Agent**: Creates and manages FAISS vector stores from literature.
+- **Analysis Agent**: Performs RAG-enhanced genetic interpretation using the FAISS vector store.
+- **Reporting Agent**: Generates structured clinical reports.
 
 #### 🎯 Agentic Advantages
 
-- **Consistency**: Eliminates inter-curator variability in variant interpretation
 - **Scalability**: Processes hundreds of genes without human bottlenecks
-- **Evidence-augmented**: Reduces hallucinations through literature-based context
+- **Evidence-Grounded**: Reduces hallucinations through a FAISS-powered RAG pipeline.
 - **Transparency**: Provides traceable reasoning from genotype to phenotype
 - **Adaptability**: Updates analysis as new literature becomes available
 
 This agentic approach transforms manual variant curation into an intelligent, automated system that maintains scientific rigor while dramatically improving throughput and consistency.
 
-### Data Input  
+{{ ... }}
 Data input as the output phased.vcf.gz from [cWGS](https://github.com/Complete-Genomics/DNBSEQ_Complete_WGS/tree/dev).  
 
 
