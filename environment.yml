@@ -11,6 +11,9 @@ dependencies:
   - plotly=5.22.0=pyhd8ed1ab_0
   - numpy=1.26.4=py311h7125741_0
   - networkx=3.3=pyhd8ed1ab_1
-  - networkx=3.3=pyhd8ed1ab_1
   - json5=0.9.25=pyhd8ed1ab_0
   - matplotlib=3.8.4=py311ha1ab1f8_2
+  - pip:
+    - langchain
+    - faiss-cpu
+    - sentence-transformers
