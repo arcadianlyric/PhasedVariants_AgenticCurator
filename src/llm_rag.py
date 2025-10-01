@@ -10,6 +10,10 @@ from pathlib import Path
 import time
 import os
 
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.vectorstores import FAISS
+from langchain.embeddings import HuggingFaceEmbeddings
+
 def read_gene_list(gene_file="../gene_list.txt"):
     """Read gene list from file"""
     try:
@@ -23,24 +27,38 @@ def read_gene_list(gene_file="../gene_list.txt"):
         print(f"❌ Error reading gene list: {e}")
         return []
 
-def load_pubmed_context_for_gene(gene_name):
-    """Load PubMed literature context for specific gene to prevent hallucinations"""
+def get_or_create_vector_store(gene_name):
+    """Load or create a FAISS vector store for a specific gene."""
     results_dir = Path("../results")
-    pubmed_file = results_dir / f"{gene_name.lower()}_pubmed_response.txt"
-    
-    try:
-        with open(pubmed_file, "r", encoding="utf-8") as f:
-            content = f.read()
-        print(f"📚 Loaded PubMed context for {gene_name}: {len(content)} characters")
-        return content
-    except FileNotFoundError:
-        print(f"⚠️ PubMed file not found for {gene_name}: {pubmed_file}")
-        return ""
-    except Exception as e:
-        print(f"⚠️ Error reading PubMed file for {gene_name}: {e}")
-        return ""
+    literature_file = results_dir / f"{gene_name.lower()}_pubmed_response.txt"
+    vector_store_path = results_dir / f"{gene_name.lower()}_faiss_index"
 
-def analyze_gene_with_rag(gene_name, pubmed_context=""):
+    if vector_store_path.exists():
+        print(f"📚 Loading existing FAISS index for {gene_name}...")
+        embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+        return FAISS.load_local(str(vector_store_path), embeddings, allow_dangerous_deserialization=True)
+
+    print(f"🧬 Creating new FAISS index for {gene_name}...")
+    if not literature_file.exists():
+        print(f"⚠️ Literature file not found for {gene_name}. Cannot create index.")
+        return None
+
+    with open(literature_file, "r", encoding="utf-8") as f:
+        text = f.read()
+
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
+    docs = text_splitter.create_documents([text])
+    
+    print(f"📄 Split literature into {len(docs)} documents.")
+
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    vector_store = FAISS.from_documents(docs, embeddings)
+    vector_store.save_local(str(vector_store_path))
+    print(f"✅ Saved FAISS index for {gene_name} to {vector_store_path}")
+    
+    return vector_store
+
+def analyze_gene_with_rag(gene_name, vector_store):
     """Analyze gene using DeepSeek API with RAG context"""
     
     # Get API key
@@ -64,17 +82,32 @@ def analyze_gene_with_rag(gene_name, pubmed_context=""):
     
     print(f"{gene_name} Analysis using DeepSeek API with RAG")
     print(f"Existing diseases: {len(existing_diseases)}")
-    print(f"PubMed context: {'Available' if pubmed_context else 'Not available'}")
+    if not vector_store:
+        print("⚠️ No vector store available. Proceeding without literature context.")
+        pubmed_context = ""
+    else:
+        print(f"✅ FAISS vector store is available for retrieval.")
     
+    # Define the core question for retrieval
+    retrieval_query = f"Summarize the function, disease mechanisms, and clinical phenotypes of the {gene_name} gene."
+    
+    # Retrieve relevant context from the vector store
+    if vector_store:
+        retriever = vector_store.as_retriever(search_kwargs={"k": 5})
+        retrieved_docs = retriever.get_relevant_documents(retrieval_query)
+        pubmed_context = "\n\n---\n\n".join([doc.page_content for doc in retrieved_docs])
+        print(f"Retrieved {len(retrieved_docs)} relevant documents from FAISS.")
+    else:
+        pubmed_context = ""
+
     # Create RAG-enhanced query
     context_section = f"""
 **IMPORTANT: Base your analysis STRICTLY on the provided PubMed literature context below. Do NOT hallucinate or make up information not supported by the literature.**
 
-**PubMed Literature Context:**
-{pubmed_context[:3000] if pubmed_context else "No literature context available - please note this limitation in your analysis."}
-{"... [truncated for length]" if len(pubmed_context) > 3000 else ""}
+**Retrieved PubMed Literature Context:**
+{pubmed_context if pubmed_context else "No literature context available - please note this limitation in your analysis."}
 
-""" if pubmed_context else ""
+"""
     
     existing_diseases_section = f"""
 **Current known disease associations ({len(existing_diseases)}):**
@@ -205,7 +238,7 @@ Any limitations in the literature context are explicitly noted in the analysis.
 
 def main():
     """Main function to analyze genes from gene list with RAG"""
-    print("🧬 Gene Analysis Agent with RAG")
+    print("🧬 Gene Analysis Agent with True RAG (FAISS)")
     print("=" * 50)
     
     # Read gene list
@@ -216,7 +249,7 @@ def main():
     
     print(f"📋 Found {len(genes)} genes to analyze: {', '.join(genes)}")
     
-    # Analyze each gene with its specific PubMed context
+    # Analyze each gene with its specific vector store
     results = []
     for i, gene in enumerate(genes, 1):
         print(f"\n{'='*60}")
@@ -224,11 +257,11 @@ def main():
         print(f"{'='*60}")
         
         try:
-            # Load gene-specific PubMed context
-            pubmed_context = load_pubmed_context_for_gene(gene)
+            # Get or create the vector store for the gene
+            vector_store = get_or_create_vector_store(gene)
             
-            # Analyze with gene-specific context
-            result = analyze_gene_with_rag(gene, pubmed_context)
+            # Analyze with the vector store
+            result = analyze_gene_with_rag(gene, vector_store)
             results.append(result)
             
             # Display key insights
