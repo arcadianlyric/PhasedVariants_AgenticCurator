@@ -36,7 +36,7 @@ python llm_rag.py
 ```
 Example output: [./results/p2rx5_rag_analysis.json](results/p2rx5_rag_analysis.json).  
 
-### Agent Architecture
+### Agentic Architecture
 
 The system implements a multi-agent architecture with specialized components working in concert:
 
@@ -61,7 +61,7 @@ Phased VCF → Variant Curator → Knowledge Graph Query → Literature Retrieva
 - **Error Recovery**: Continues analysis even when individual components fail
 - **Scalable Architecture**: Handles single genes or batch processing seamlessly
 
-**Agent Components:**
+**Agentic Components:**
 - **Variant Curator Agent**: Identifies high-impact variants from phased data.
 - **Knowledge Graph Agent**: Maps genes to disease networks and pathways.
 - **Literature Retrieval Agent**: Fetches relevant PubMed abstracts automatically.
