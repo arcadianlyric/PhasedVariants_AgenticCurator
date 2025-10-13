@@ -37,11 +37,19 @@ python llm_rag.py
 Example output: [./results/p2rx5_rag_analysis.json](results/p2rx5_rag_analysis.json).  
 
 ### Agent Architecture
-{{ ... }}
+
+The system implements a multi-agent architecture with specialized components working in concert:
+
+**1. Data Sources & Integration**
 - **Knowledge Graph Integration**: Leverages PrimeKG to understand gene-disease-pathway relationships
 - **Vector Store**: A FAISS index built from gene-specific PubMed abstracts.
 - **Semantic Search**: Retrieves the most relevant text chunks for the LLM.
 - **Analysis Method**: True Retrieval-Augmented Generation to prevent hallucinations.
+
+**2. Workflow Pipeline**
+```
+Phased VCF → Variant Curator → Knowledge Graph Query → Literature Retrieval → Vector Store Creation → RAG Analysis → Clinical Report
+```
 
 **3. RAG-Enhanced Intelligence**
 - **Retrieval-Augmented Generation**: Implements a true RAG pipeline using FAISS to find the most relevant literature snippets, preventing hallucinations.
@@ -51,7 +59,7 @@ Example output: [./results/p2rx5_rag_analysis.json](results/p2rx5_rag_analysis.j
 **4. Adaptive Workflow**
 - **Gene List Processing**: Automatically reads and processes multiple genes from configuration
 - **Error Recovery**: Continues analysis even when individual components fail
-{{ ... }}
+- **Scalable Architecture**: Handles single genes or batch processing seamlessly
 
 **Agent Components:**
 - **Variant Curator Agent**: Identifies high-impact variants from phased data.
@@ -70,7 +78,7 @@ Example output: [./results/p2rx5_rag_analysis.json](results/p2rx5_rag_analysis.j
 
 This agentic approach transforms manual variant curation into an intelligent, automated system that maintains scientific rigor while dramatically improving throughput and consistency.
 
-{{ ... }}
+### Data Input
 Data input as the output phased.vcf.gz from [cWGS](https://github.com/Complete-Genomics/DNBSEQ_Complete_WGS/tree/dev).  
 
 
