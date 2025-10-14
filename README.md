@@ -208,9 +208,6 @@ Data input as the output phased.vcf.gz from [cWGS](https://github.com/Complete-G
 15. [Sentence Transformers](https://www.sbert.net/) - Text embeddings
 16. [Agentic AI](https://github.com/coursera/agentic-ai-public) - Multi-agent patterns
 17. [LangGraph](https://github.com/langchain-ai/langgraph) - Agent orchestration
-
-
-**Utilities:**
 18. [liftOver](http://hgdownload.cse.ucsc.edu/goldenPath/hg38/liftOver/) - Genome coordinate conversion
 19. [HuggingFace](https://huggingface.co/) - Model hub and transformers
 
