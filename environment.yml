@@ -17,3 +17,4 @@ dependencies:
     - langchain
     - faiss-cpu
     - sentence-transformers
+    - wikipedia
