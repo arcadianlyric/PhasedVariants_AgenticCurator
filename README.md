@@ -20,7 +20,7 @@ python explore_phased_vcf.py --vcf_file $vcf_file --kg_path $kg_path --ref_fai $
 ```
 Output variants with VEP HIGH impact on both copies. Such vairants are used to mine Knowledge Graph to get gene networks connected by diseases, phenotypes and pathways. There are 2 files in the ./results folder: network_graph.html and gene_associations.json. The [results/network_graph.html](results/network_graph.html) is a interactive visulization. 
 User select genes of interest from the gene network, create gene_list.json for next step.   
-[network_graph](images/network_graph.jpg) 
+![network_graph](images/network_graph.jpg) 
 
 2. Multi-source literature retrieval and agentic gene/variant curation.    
 
