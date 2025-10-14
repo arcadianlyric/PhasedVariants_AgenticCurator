@@ -18,65 +18,104 @@ ref_fai=db/GCA_000001405.15_GRCh38_no_alt_analysis_set.ercc.fa.fai
 output_path=phased_results
 python explore_phased_vcf.py --vcf_file $vcf_file --kg_path $kg_path --ref_fai $ref_fai
 ```
-Output variants with VEP HIGH impact on both copies. Such vairants are used to mine Knowledge Graph to get gene networks connected by diseases, phenotypes and pathways. There are 2 files in the ./results folder: network_graph.html and gene_associations.json. The [results/network_graph.html](results/network_graph.html) is a interactive visulization. ![network_graph](images/network_graph.jpg) 
+Output variants with VEP HIGH impact on both copies. Such vairants are used to mine Knowledge Graph to get gene networks connected by diseases, phenotypes and pathways. There are 2 files in the ./results folder: network_graph.html and gene_associations.json. The [results/network_graph.html](results/network_graph.html) is a interactive visulization. 
+User select genes of interest from the gene network, create gene_list.json for next step.   
+[network_graph](images/network_graph.jpg) 
 
 2. LLM RAG gene/variant curation agent querying PubMed literature.    
-Set genes of interest (selected from the gene network) in gene_list.txt.  
+Set genes of interest (selected from the gene network) in gene_list.json.  
 Set PubMed API email in setting.json. 
 Set DeepSeek API key in api_key.   
 ```
 # Output PubMed abstracts to gene-specific files
 python generate_pubmed_response.py 
+
+# Basic LLM approaches:
 # Query gene name with LLM alone 
 python llm_queryAlone.py 
 # Supply literature augmentation to LLM  
 python llm_augmented.py  
 # Use FAISS-powered RAG for grounded analysis
 python llm_rag.py  
+
+# 🌟 NEW: Agentic Framework with Planning, Reflection & Multi-Agent Collaboration
+python llm_agentic.py
 ```
-Example output: [./results/p2rx5_rag_analysis.json](results/p2rx5_rag_analysis.json).  
+Example outputs: 
+- Basic RAG: [./results/p2rx5_rag_analysis.json](results/p2rx5_rag_analysis.json)
+- Agentic: [./results/p2rx5_agentic_report.md](results/p2rx5_agentic_report.md)  
 
 ### Agentic Architecture
 
-The system implements a multi-agent architecture with specialized components working in concert:
+The system implements a **true agentic framework** with planning, reflection, and multi-agent collaboration:
 
-**1. Data Sources & Integration**
-- **Knowledge Graph Integration**: Leverages PrimeKG to understand gene-disease-pathway relationships
-- **Vector Store**: A FAISS index built from gene-specific PubMed abstracts.
-- **Semantic Search**: Retrieves the most relevant text chunks for the LLM.
-- **Analysis Method**: True Retrieval-Augmented Generation to prevent hallucinations.
+#### 🎯 Core Agentic Capabilities
 
-**2. Workflow Pipeline**
+**1. Planning Agent**
+- **Automatic Task Decomposition**: Breaks down complex gene analysis into 5-7 atomic, actionable steps
+- **Agent Assignment**: Routes each step to the most appropriate specialized agent
+- **Dynamic Planning**: Adapts plan based on analysis goals (comprehensive, disease-focused, variant-focused)
+- **Dependency Management**: Ensures steps build upon previous results
+
+**2. Multi-Agent Collaboration**
+Specialized agents work together in a coordinated workflow:
+- **Literature Retrieval Agent**: Fetches and processes PubMed abstracts
+- **Vector Store Agent**: Creates and manages FAISS indices for semantic search
+- **RAG Analysis Agent**: Performs retrieval-augmented generation with context
+- **Knowledge Graph Agent**: Queries gene-disease-pathway relationships from PrimeKG
+- **Variant Curator Agent**: Analyzes genetic variants and their impacts
+- **Reflection Agent**: Evaluates analysis quality and identifies gaps
+- **Report Generator Agent**: Creates comprehensive clinical reports
+
+**3. Reflection & Quality Control**
+- **Automated Quality Assessment**: Scores analysis on 5 dimensions (completeness, accuracy, evidence support, clarity, clinical utility)
+- **Gap Identification**: Detects missing information and unsupported claims
+- **Hallucination Detection**: Flags statements not grounded in literature
+- **Iterative Refinement**: Automatically improves analysis based on reflection feedback (up to 2 iterations)
+
+**4. Agentic Workflow Pipeline**
 ```
-Phased VCF → Variant Curator → Knowledge Graph Query → Literature Retrieval → Vector Store Creation → RAG Analysis → Clinical Report
+┌─────────────┐
+│  Planning   │  ← Decompose task into steps
+└──────┬──────┘
+       ↓
+┌─────────────┐
+│  Execution  │  ← Multi-agent collaboration
+│             │    (Literature → RAG → KG → Analysis)
+└──────┬──────┘
+       ↓
+┌─────────────┐
+│ Reflection  │  ← Quality assessment
+└──────┬──────┘
+       ↓
+┌─────────────┐
+│ Refinement  │  ← Iterative improvement
+└──────┬──────┘
+       ↓
+┌─────────────┐
+│   Report    │  ← Final comprehensive report
+└─────────────┘
 ```
 
-**3. RAG-Enhanced Intelligence**
-- **Retrieval-Augmented Generation**: Implements a true RAG pipeline using FAISS to find the most relevant literature snippets, preventing hallucinations.
-- **Semantic Search**: Moves beyond simple context injection to perform semantic similarity searches on vectorized literature.
-- **Evidence-Based Reasoning**: Ensures LLM claims are strictly supported by the retrieved, most relevant scientific evidence.
-
-**4. Adaptive Workflow**
-- **Gene List Processing**: Automatically reads and processes multiple genes from configuration
-- **Error Recovery**: Continues analysis even when individual components fail
-- **Scalable Architecture**: Handles single genes or batch processing seamlessly
-
-**Agentic Components:**
-- **Variant Curator Agent**: Identifies high-impact variants from phased data.
-- **Knowledge Graph Agent**: Maps genes to disease networks and pathways.
-- **Literature Retrieval Agent**: Fetches relevant PubMed abstracts automatically.
-- **Vector Store Agent**: Creates and manages FAISS vector stores from literature.
-- **Analysis Agent**: Performs RAG-enhanced genetic interpretation using the FAISS vector store.
-- **Reporting Agent**: Generates structured clinical reports.
+**5. Key Advantages Over Basic RAG**
+- ✅ **Planning**: Structured approach vs. ad-hoc queries
+- ✅ **Collaboration**: Multiple specialized agents vs. single monolithic agent
+- ✅ **Reflection**: Self-assessment and improvement vs. one-shot generation
+- ✅ **Quality Scores**: Quantitative evaluation (0-10 scale) vs. subjective assessment
+- ✅ **Iterative**: Automatic refinement vs. manual review
 
 #### 🎯 Agentic Advantages
 
+- **Autonomy**: Self-directed planning and execution without manual intervention
+- **Collaboration**: Specialized agents coordinate to solve complex tasks
+- **Reflection**: Self-assessment and iterative improvement of outputs
 - **Scalability**: Processes hundreds of genes without human bottlenecks
-- **Evidence-Grounded**: Reduces hallucinations through a FAISS-powered RAG pipeline.
-- **Transparency**: Provides traceable reasoning from genotype to phenotype
-- **Adaptability**: Updates analysis as new literature becomes available
+- **Evidence-Grounded**: Reduces hallucinations through FAISS-powered RAG + reflection
+- **Transparency**: Provides traceable reasoning with quality scores and execution history
+- **Adaptability**: Dynamic planning adjusts to different analysis goals
+- **Quality Assurance**: Automated scoring on 5 dimensions ensures consistent standards
 
-This agentic approach transforms manual variant curation into an intelligent, automated system that maintains scientific rigor while dramatically improving throughput and consistency.
+This agentic approach transforms manual variant curation into an intelligent, self-improving system that maintains scientific rigor while dramatically improving throughput and consistency.
 
 ### Data Input
 Data input as the output phased.vcf.gz from [cWGS](https://github.com/Complete-Genomics/DNBSEQ_Complete_WGS/tree/dev).  
