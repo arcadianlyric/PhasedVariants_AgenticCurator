@@ -1,0 +1,78 @@
+{
+  "gene_name": "P2RX5",
+  "disease": "cancer",
+  "variant_id": "rs2142993306",
+  "search_strategy": [
+    "P2RX5 cancer rs2142993306",
+    "P2RX5 cancer",
+    "P2RX5 rs2142993306",
+    "P2RX5 gene"
+  ],
+  "sources": {
+    "pubmed": {
+      "status": "success",
+      "file": "/Users/yc/Documents/GitHub/llm_genetics_assistant/results/p2rx5_pubmed_response.txt"
+    },
+    "wikipedia": {
+      "status": "success",
+      "data": [
+        {
+          "source": "Wikipedia",
+          "title": "P2RX5",
+          "summary": "P2X purinoceptor 5 is a protein in humans that is encoded by the P2RX5 gene.\nThe product of this gene belongs to the family of purinoceptors for ATP. This receptor functions as a ligand-gated ion channel. Several characteristic motifs of ATP-gated channels are present in its primary structure, but, unlike other members of the purinoceptors family, this receptor has only a single transmembrane domain. Four transcript variants encoding distinct isoforms have been identified for this gene.\n\n\n== See also ==\nP2X receptor\n\n\n== References ==\n\n\n== Further reading ==\n\n\n== External links ==\nP2RX5+protein,+human at the U.S. National Library of Medicine Medical Subject Headings (MeSH)\nThis article incorporates text from the United States National Library of Medicine, which is in the public domain.",
+          "url": "https://en.wikipedia.org/wiki/P2RX5",
+          "full_text": "P2X purinoceptor 5 is a protein in humans that is encoded by the P2RX5 gene.\nThe product of this gene belongs to the family of purinoceptors for ATP. This receptor functions as a ligand-gated ion channel. Several characteristic motifs of ATP-gated channels are present in its primary structure, but, unlike other members of the purinoceptors family, this receptor has only a single transmembrane domain. Four transcript variants encoding distinct isoforms have been identified for this gene.\n\n\n== See also ==\nP2X receptor\n\n\n== References ==\n\n\n== Further reading ==\n\n\n== External links ==\nP2RX5+protein,+human at the U.S. National Library of Medicine Medical Subject Headings (MeSH)\nThis article incorporates text from the United States National Library of Medicine, which is in the public domain.",
+          "query_used": "P2RX5 gene"
+        }
+      ],
+      "query_used": "P2RX5 gene"
+    },
+    "arxiv": {
+      "status": "success",
+      "data": [
+        {
+          "source": "arXiv",
+          "title": "Sensor technologies in cancer research for new directions in diagnosis\n  and treatment: and exploratory analysis",
+          "authors": [
+            "Mario Coccia",
+            "Saeed Roshani",
+            "Melika Mosleh"
+          ],
+          "published": "2022-02-04",
+          "url": "http://arxiv.org/abs/2203.00502v1",
+          "summary": "The goal of this study is an exploratory analysis concerning main sensor\ntechnologies applied in cancer research to detect new directions in diagnosis\nand treatments. The study focused on types of cancer having a high incidence\nand mortality worldwide: breast, lung, colorectal and prostate. Data of the Web\nof Science (WOS) core collection database are used to retrieve articles related\nto sensor technologies and cancer research over 1991-2021 period. We utilized\nGephi software version 0.9.2 to visualize the co-word networks of the\ninteraction between sensor technologies and cancers under study. Results show\nmain clusters of interaction per typology of cancer. Biosensor is the only type\nof sensor that plays an essential role in all types of cancer: breast cancer,\nlung cancer, prostate cancer, and colorectal cancer. Electrochemical sensor is\napplied in all types of cancer under study except lung cancer. Electrochemical\nbiosensor is used in breast cancer, lung cancer, and prostate cancer research\nbut not colorectal cancer. Optical sensor can also be considered one of the\nsensor technologies that significantly is used in breast cancer, prostate\ncancer, and colorectal cancer. This study shows that this type of sensor is\napplied in more diversified approaches. Moreover, the oxygen sensor is mostly\nstudied in lung cancer and breast cancer due to the usage in breath analysis\nfor the treatment process. Finally, Cmos sensor is a technology used mainly in\nlung cancer and colorectal cancer. Results here suggest new directions for the\nevolution of science and technology of sensors in cancer research to support\ninnovation and research policy directed to new technological trajectories\nhaving a potential of accelerated growth and positive social impact for\ndiagnosis and treatments of cancer.",
+          "link_pdf": "http://arxiv.org/pdf/2203.00502v1",
+          "query_used": "P2RX5 cancer rs2142993306"
+        },
+        {
+          "source": "arXiv",
+          "title": "Discovery of cancer common and specific driver gene sets",
+          "authors": [
+            "Junhua Zhang",
+            "Shihua Zhang"
+          ],
+          "published": "2016-12-30",
+          "url": "http://arxiv.org/abs/1612.09478v1",
+          "summary": "Cancer is known as a disease mainly caused by gene alterations. Discovery of\nmutated driver pathways or gene sets is becoming an important step to\nunderstand molecular mechanisms of carcinogenesis. However, systematically\ninvestigating commonalities and specificities of driver gene sets among\nmultiple cancer types is still a great challenge, but this investigation will\nundoubtedly benefit deciphering cancers and will be helpful for personalized\ntherapy and precision medicine in cancer treatment. In this study, we propose\ntwo optimization models to \\emph{de novo} discover common driver gene sets\namong multiple cancer types (ComMDP) and specific driver gene sets of one\ncertain or multiple cancer types to other cancers (SpeMDP), respectively. We\nfirst apply ComMDP and SpeMDP to simulated data to validate their efficiency.\nThen, we further apply these methods to 12 cancer types from The Cancer Genome\nAtlas (TCGA) and obtain several biologically meaningful driver pathways. As\nexamples, we construct a common cancer pathway model for BRCA and OV, infer a\ncomplex driver pathway model for BRCA carcinogenesis based on common driver\ngene sets of BRCA with eight cancer types, and investigate specific driver\npathways of the liquid cancer lymphoblastic acute myeloid leukemia (LAML)\nversus other solid cancer types. In these processes more candidate cancer genes\nare also found.",
+          "link_pdf": "http://arxiv.org/pdf/1612.09478v1",
+          "query_used": "P2RX5 cancer rs2142993306"
+        },
+        {
+          "source": "arXiv",
+          "title": "Multivariate Spatio-temporal Modelling for Completing Cancer Registries\n  and Forecasting Incidence",
+          "authors": [
+            "Garazi Retegui",
+            "Jaione Etxeberria",
+            "María Dolores Ugarte"
+          ],
+          "published": "2025-07-29",
+          "url": "http://arxiv.org/abs/2507.21714v1",
+          "summary": "Cancer data, particularly cancer incidence and mortality, are fundamental to\nunderstand the cancer burden, to set targets for cancer control and to evaluate\nthe evolution of the implementation of a cancer control policy. However, the\ncomplexity of data collection, classification, validation and processing result\nin cancer incidence figures often lagging two to three years behind the\ncalendar year. In response, national or regional population-based cancer\nregistries (PBCRs) are increasingly interested in methods for forecasting\ncancer incidence. However, in many countries there is an additional difficulty\nin projecting cancer incidence as regional registries are usually not\nestablished in the same year and therefore cancer incidence data series between\ndifferent regions of a country are not harmonised over time. This study\naddresses the challenge of forecasting cancer incidence with incomplete data at\nboth regional and national levels. To achieve our objective, we propose the use\nof multivariate spatio-temporal shared component models that jointly model\nmortality data and available cancer incidence data. The performance of these\nmultivariate models are analyzed using lung cancer incidence data, together\nwith the number of deaths reported in England in the period 2001-2019.\nDifferent model predictive measures have been calculated to select the best\nmodel.",
+          "link_pdf": "http://arxiv.org/pdf/2507.21714v1",
+          "query_used": "P2RX5 cancer rs2142993306"
+        }
+      ],
+      "query_used": "P2RX5 cancer rs2142993306"
+    }
+  }
+}

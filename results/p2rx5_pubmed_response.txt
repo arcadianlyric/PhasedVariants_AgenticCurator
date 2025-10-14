@@ -1,46 +1,99 @@
 # PubMed Search Results for: P2RX5
-# Found 5 articles
+# Found 10 articles
 # ==================================================
 
-1. Ann Endocrinol (Paris). 2025 Sep 10:102456. doi: 10.1016/j.ando.2025.102456. 
-Online ahead of print.
+1. Medicine (Baltimore). 2025 Oct 3;104(40):e44923. doi: 
+10.1097/MD.0000000000044923.
+
+Identification of key mitophagy-related genes in osteomyelitis: Insights from 
+differential gene expression and machine learning models.
+
+Zhou S(1), Bai F, Wang S, Zhou Y, Yao P, Zheng Q.
+
+Author information:
+(1)The First People's Hospital of Zunyi, Zunyi, China.
+
+Osteomyelitis, a severe skeletal infection, involves complex pathogenic 
+mechanisms. Mitophagy (mitophagy) is crucial for cellular homeostasis and has 
+been linked to various diseases, including osteomyelitis. This study explores 
+the genetic basis of mitophagy in osteomyelitis, identifying differentially 
+expressed genes related to mitophagy and their potential as biomarkers and 
+therapeutic targets. Using the GSE30119 dataset from GEO, mRNA expression 
+profiles from 49 osteomyelitis patients and 44 healthy individuals were 
+analyzed. Differential gene expression analysis identified 2876 differentially 
+expressed genes with a threshold of |log FC| > 0.5 and P < .05. 
+Mitophagy-related genes were sourced from GeneCards, with 25 overlapping genes 
+identified. Functional enrichment analyses, including gene ontology and Kyoto 
+encyclopedia of genes and genomes, were conducted. Four machine learning models 
+(generalized linear model, random forest, support vector machine, and extreme 
+gradient boosting) identified 9 key genes for a diagnostic model. Gene set 
+enrichment analysis and immune cell infiltration analysis using CIBERSORT were 
+performed. Furthermore, RT-qPCR was performed to experimentally validate the 
+expression patterns of the identified key genes in an inflammatory cellular 
+model. Twenty-five intersecting genes were identified, with gene ontology and 
+Kyoto encyclopedia of genes and genomes analyses highlighting their roles in 
+autophagy and mitochondrial functions. The random forest model identified 9 key 
+genes: BMP2KL, ALPK1, PGAM5, PINK1, TP53, GPC1, ITPKC, PEX3, and P2RX5, 
+validated with an area under the receiver operating characteristic curve of 
+0.905. Gene set enrichment analysis indicated their involvement in metabolic and 
+signaling pathways. Immune infiltration analysis revealed significant 
+differences between patients and healthy individuals. RT-qPCR validation 
+confirmed significant expression changes of the 9 key genes under inflammatory 
+conditions, consistent with bioinformatics predictions. This study identifies 
+key mitophagy genes and targets in osteomyelitis, providing a basis for future 
+research and therapies.
+
+Copyright © 2025 the Author(s). Published by Wolters Kluwer Health, Inc.
+
+DOI: 10.1097/MD.0000000000044923
+PMCID: PMC12499707
+PMID: 41054110 [Indexed for MEDLINE]
+
+Conflict of interest statement: The authors have no conflicts of interest to 
+disclose.
+
+
+2. Ann Endocrinol (Paris). 2025 Sep 10;86(5):102456. doi: 
+10.1016/j.ando.2025.102456. Online ahead of print.
 
 Analysis of genetic predisposition to familial non-medullary thyroid cancer by 
 whole genome sequencing.
 
-Cao CD(1), Desailloud R(2), Topolinski H(3), Crépin M(4), Flament C(4), 
+Do Cao C(1), Desailloud R(2), Topolinski H(3), Crépin M(4), Flament C(4), 
 Leteurtre E(5), Cardot-Bauters C(1), Frénois F(6), Ait-Yahya É(7), Bonte F(7), 
 Leclerc J(8), Pigny P(9).
 
 Author information:
-(1)CHU Lille, Service d'Endocrinologie et Métabolisme, F-59037 Lille, France.
-(2)CHU Amiens, Service d'Endocrinologie et Métabolisme, F-80054 Amiens, France.
-(3)CH Béthune, Service Endocrinologie Diabétologie, F-62408 Béthune, France.
-(4)CHU Lille, Service de Biochimie, "Hormonologie, Métabolisme, Nutrition et 
-Oncologie", F-59037 Lille, France.
-(5)Univ. Lille, CNRS, Inserm, CHU Lille, UMR9020-U1277-CANTHER-Cancer 
-Heterogeneity Plasticity and Resistance to Therapies, F-59000 Lille, France.
-(6)CHU Lille, Faculté de Médecine ULR 7364 Équipe RADEME, F-59037 Lille, France.
-(7)CHU Lille, Équipe Bio-Informatique, F-59037 Lille, France.
-(8)CHU Lille, Service de Biochimie, "Hormonologie, Métabolisme, Nutrition et 
-Oncologie", F-59037 Lille, France; Univ. Lille, CNRS, Inserm, CHU Lille, 
-UMR9020-U1277 - CANTHER - Cancer Heterogeneity Plasticity and Resistance to 
-Therapies, F-59000 Lille, France.
-(9)CHU Lille, Service de Biochimie, "Hormonologie, Métabolisme, Nutrition et 
-Oncologie", F-59037 Lille, France; Univ. Lille, CNRS, Inserm, CHU Lille, 
-UMR9020-U1277 - CANTHER - Cancer Heterogeneity Plasticity and Resistance to 
-Therapies, F-59000 Lille, France. Electronic address: pascal.pigny@chu-lille.fr.
+(1)Service d'endocrinologie et métabolisme, CHU de Lille, 59037 Lille, France.
+(2)Service d'endocrinologie et métabolisme, CHU d'Amiens, 80054 Amiens, France.
+(3)Service d'endocrinologie diabétologie, CH de Béthune, 62408 Béthune, France.
+(4)Service de biochimie, "Hormonologie, Métabolisme, Nutrition et Oncologie", 
+CHU de Lille, 59037 Lille, France.
+(5)CNRS, Inserm, UMR9020-U1277 - Cancer Heterogeneity Plasticity and Resistance 
+to Therapies (CANTHER), CHU de Lille, University Lille, 59000 Lille, France.
+(6)Faculté de médecine, ULR 7364 équipe RADEME, CHU de Lille, 59037 Lille, 
+France.
+(7)Équipe bio-informatique, CHU de Lille, 59037 Lille, France.
+(8)Service de biochimie, "Hormonologie, Métabolisme, Nutrition et Oncologie", 
+CHU de Lille, 59037 Lille, France; CNRS, Inserm, UMR9020-U1277 - Cancer 
+Heterogeneity Plasticity and Resistance to Therapies (CANTHER), CHU de Lille, 
+University Lille, 59000 Lille, France.
+(9)Service de biochimie, "Hormonologie, Métabolisme, Nutrition et Oncologie", 
+CHU de Lille, 59037 Lille, France; CNRS, Inserm, UMR9020-U1277 - Cancer 
+Heterogeneity Plasticity and Resistance to Therapies (CANTHER), CHU de Lille, 
+University Lille, 59000 Lille, France. Electronic address: 
+pascal.pigny@chu-lille.fr.
 
 BACKGROUND: Several putative susceptibility genes for familial papillary thyroid 
 carcinoma, or familial non-medullary thyroid carcinoma (FNMTC), have been 
 identified. However, in most families the molecular basis for FNMTC remains 
 elusive.
-METHODS: Two families with ≥ 3 first-degree relatives in ≥ 2 generations and ≥ 2 
-unaffected relatives were selected. Germline DNA from 2 patients and 2 
-unaffected individuals per family were analyzed by whole genome sequencing. All 
-individuals were genotyped for putative pathogenic variants by Sanger 
-sequencing, and minor allele frequency (MAF) was determined in 179 PTC-free 
-European controls and the GnomAD data base. Methylation analysis of candidate 
+METHODS: Two families with≥3 first-degree relatives in≥2 generations 
+and≥2 unaffected relatives were selected. Germline DNA from 2 patients and 
+2 unaffected individuals per family were analyzed by whole genome sequencing. 
+All individuals were genotyped for putative pathogenic variants by Sanger 
+sequencing, and minor allele frequency (MAF) was determined in 179 PTC-free 
+European controls and the GnomAD database. Methylation analysis of candidate 
 genes was carried out by EPIC BeadChips or pyrosequencing on germline and 
 tumoral DNA.
 RESULTS: Heterozygous variants in cancer-related genes expressed in thyroid 
@@ -63,8 +116,11 @@ reserved.
 DOI: 10.1016/j.ando.2025.102456
 PMID: 40939960
 
+Conflict of interest statement: Disclosure of interest The authors declare that 
+they have no competing interest.
 
-2. Int J Mol Sci. 2025 Jul 4;26(13):6474. doi: 10.3390/ijms26136474.
+
+3. Int J Mol Sci. 2025 Jul 4;26(13):6474. doi: 10.3390/ijms26136474.
 
 The Purinergic Receptor P2X5 Modulates Glucose Metabolism and Expression of 
 Thermogenic Genes in Brown Adipose Tissue.
@@ -102,7 +158,7 @@ or interpretation of data; in the writing of the manuscript; or in the decision
 to publish the results.
 
 
-3. BMC Neurol. 2025 Jul 1;25(1):261. doi: 10.1186/s12883-025-04231-3.
+4. BMC Neurol. 2025 Jul 1;25(1):261. doi: 10.1186/s12883-025-04231-3.
 
 A novel gene signature for forecasting time to next relapse in multiple 
 sclerosis using peripheral blood mononuclear cells.
@@ -164,7 +220,7 @@ obtained from all participants. Consent for publication: Not applicable.
 Competing interests: The authors declare no competing interests.
 
 
-4. Poult Sci. 2025 Jul;104(7):105245. doi: 10.1016/j.psj.2025.105245. Epub 2025
+5. Poult Sci. 2025 Jul;104(7):105245. doi: 10.1016/j.psj.2025.105245. Epub 2025
 May  1.
 
 Indigenous broilers in crossbreeding: impacts on meat quality and candidate gene 
@@ -219,7 +275,7 @@ Conflict of interest statement: Declaration of competing interest All authors
 declared that they have no conflicts of interest to this work.
 
 
-5. Prostate Cancer Prostatic Dis. 2025 Sep;28(3):773-781. doi: 
+6. Prostate Cancer Prostatic Dis. 2025 Sep;28(3):773-781. doi: 
 10.1038/s41391-024-00918-9. Epub 2024 Nov 14.
 
 Enhancing risk stratification models in localized prostate cancer by novel 
@@ -290,3 +346,224 @@ roles for DKG AUO and DGU. The authors declare no potential conflicts of
 interest with the present project and publication. Ethics: The study was 
 performed in compliance with the Declaration of Helsinki and the institutional 
 ethics committees approved the study protocol (21-9991-BO and KEK-BE128/2015).
+
+
+7. Adipocyte. 2024 Dec;13(1):2421745. doi: 10.1080/21623945.2024.2421745. Epub
+2024  Nov 1.
+
+A key role for P2RX5 in brown adipocyte differentiation and energy homeostasis.
+
+Razzoli M(1), McGonigle S(1), Sahu BS(1)(2), Rodriguez P(1), Svedberg D(1), Rao 
+L(3), Ruocco C(4), Nisoli E(4), Vezzani B(5), Frontini A(3), Bartolomucci A(1).
+
+Author information:
+(1)Department of Integrative Biology and Physiology, University of Minnesota, 
+Minneapolis, MN, USA.
+(2)Cellular and Molecular Neurosciences Division, DBT- National Brain Research 
+Center, Manesar, Gurgaon, India.
+(3)Department of Life and Environmental Sciences, Università Politecnica delle 
+Marche, Università degli Studi di Ancona, Ancona, Italy.
+(4)Center for Study and Research on Obesity, Department of Medical Biotechnology 
+and Translational Medicine, University of Milan, Milano, Italy.
+(5)Department of Medicine and Surgery, University of Parma, Parma, Italy.
+
+Brown adipocytes are defined based on a distinct morphology and genetic 
+signature that includes, amongst others, the expression of the Purinergic 2 
+Receptor X5 (P2RX5). However, the role of P2RX5 in brown adipocyte and brown 
+adipose tissue function is poorly characterized. In the present study, we 
+conducted a metabolic characterization of P2RX5 knockout male mice; next, we 
+characterized this purinergic pathway in a cell-autonomous context in brown 
+adipocytes. We then tested the role of the P2RX5 receptor agonism in metabolic 
+responses in vivo in conditions of minimal adaptive thermogenesis requirements. 
+Our data show that loss of P2RX5 causes reduced brown adipocyte differentiation 
+in vitro, and browning in vivo. Lastly, we unravel a previously unappreciated 
+role for P2RX5 agonism to exert an anti-obesity effect in the presence of 
+enhanced brown adipose tissue recruitment in male mice housed at 
+thermoneutrality. Altogether, our data support a role for P2RX5 in mediating 
+brown adipocyte differentiation and function that could be further targeted for 
+benefits in the context of adipose tissue pathology and metabolic diseases.
+
+DOI: 10.1080/21623945.2024.2421745
+PMCID: PMC11540092
+PMID: 39484996 [Indexed for MEDLINE]
+
+Conflict of interest statement: No potential conflict of interest was reported 
+by the author(s).
+
+
+8. Sci Adv. 2024 May 24;10(21):eadn7655. doi: 10.1126/sciadv.adn7655. Epub 2024
+May  23.
+
+Brain cell-type shifts in Alzheimer's disease, autism, and schizophrenia 
+interrogated using methylomics and genetics.
+
+Yap CX(1)(2)(3)(4), Vo DD(3)(4)(5)(6)(7)(8), Heffel MG(5)(9), Bhattacharya 
+A(10)(11)(12)(13), Wen C(3)(4)(5), Yang Y(1)(2), Kemper KE(2), Zeng J(2), Zheng 
+Z(2), Zhu Z(2)(14), Hannon E(15), Vellame DS(15), Franklin A(15), Caggiano 
+C(9)(16), Wamsley B(3)(4)(16)(17), Geschwind DH(3)(4)(5)(16)(17), Zaitlen 
+N(16)(18), Gusev A(19)(20)(21), Pasaniuc B(5)(9)(10)(18)(22), Mill J(15), Luo 
+C(5), Gandal MJ(3)(4)(5)(6)(7)(8).
+
+Author information:
+(1)Mater Research Institute, University of Queensland, Brisbane, Queensland, 
+Australia.
+(2)Institute for Molecular Bioscience, University of Queensland, Brisbane, 
+Queensland, Australia.
+(3)Department of Psychiatry, David Geffen School of Medicine, University of 
+California, Los Angeles, Los Angeles, CA, USA.
+(4)Program in Neurobehavioral Genetics, Semel Institute, David Geffen School of 
+Medicine, University of California, Los Angeles, Los Angeles, CA, USA.
+(5)Department of Human Genetics, David Geffen School of Medicine, University of 
+California, Los Angeles, Los Angeles, CA, USA.
+(6)Lifespan Brain Institute at Penn Medicine and The Children's Hospital of 
+Philadelphia, Department of Psychiatry, University of Pennsylvania, 
+Philadelphia, PA, USA.
+(7)Department of Psychiatry, Perelman School of Medicine, University of 
+Pennsylvania, Philadelphia, PA, USA.
+(8)Department of Genetics, Perelman School of Medicine, University of 
+Pennsylvania, Philadelphia, PA, USA.
+(9)Bioinformatics Interdepartmental Program, University of California Los 
+Angeles, Los Angeles, CA, USA.
+(10)Department of Pathology and Laboratory Medicine, David Geffen School of 
+Medicine, University of California, Los Angeles, CA, USA.
+(11)Institute for Quantitative and Computational Biosciences, David Geffen 
+School of Medicine, University of California, Los Angeles, CA, USA.
+(12)Department of Epidemiology, University of Texas MD Anderson Cancer Center, 
+Houston, TX, USA.
+(13)Institute for Data Science in Oncology, University of Texas MD Anderson 
+Cancer Center, Houston, TX, USA.
+(14)The National Centre for Register-based Research, Aarhus University, Denmark.
+(15)Department of Clinical and Biomedical Sciences, University of Exeter Medical 
+School, University of Exeter, Exeter, UK.
+(16)Department of Neurology, University of California Los Angeles, Los Angeles, 
+CA, USA.
+(17)Center for Autism Research and Treatment, Semel Institute, University of 
+California, Los Angeles, Los Angeles, CA, USA.
+(18)Department of Computational Medicine, University of California Los Angeles, 
+Los Angeles, CA, USA.
+(19)Department of Medical Oncology, Dana-Farber Cancer Institute and Harvard 
+Medical School, Boston, MA, USA.
+(20)Division of Genetics, Brigham & Women's Hospital, Boston, MA, USA.
+(21)Medical and Population Genetics, Broad Institute, Cambridge, MA, USA.
+(22)Institute for Precision Health, University of California, Los Angeles, Los 
+Angeles, CA, USA.
+
+Few neuropsychiatric disorders have replicable biomarkers, prompting 
+high-resolution and large-scale molecular studies. However, we still lack 
+consensus on a more foundational question: whether quantitative shifts in cell 
+types-the functional unit of life-contribute to neuropsychiatric disorders. 
+Leveraging advances in human brain single-cell methylomics, we deconvolve seven 
+major cell types using bulk DNA methylation profiling across 1270 postmortem 
+brains, including from individuals diagnosed with Alzheimer's disease, 
+schizophrenia, and autism. We observe and replicate cell-type compositional 
+shifts for Alzheimer's disease (endothelial cell loss), autism (increased 
+microglia), and schizophrenia (decreased oligodendrocytes), and find age- and 
+sex-related changes. Multiple layers of evidence indicate that endothelial cell 
+loss contributes to Alzheimer's disease, with comparable effect size to APOE 
+genotype among older people. Genome-wide association identified five genetic 
+loci related to cell-type composition, involving plausible genes for the 
+neurovascular unit (P2RX5 and TRPV3) and excitatory neurons (DPY30 and MEMO1). 
+These results implicate specific cell-type shifts in the pathophysiology of 
+neuropsychiatric disorders.
+
+DOI: 10.1126/sciadv.adn7655
+PMCID: PMC11114225
+PMID: 38781333 [Indexed for MEDLINE]
+
+
+9. BMC Cancer. 2023 Nov 27;23(1):1152. doi: 10.1186/s12885-023-11238-x.
+
+Function and regulation of miR-186-5p, miR-125b-5p and miR-1260a in chordoma.
+
+Huo X(1), Wang K(2), Yao B(1), Song L(1), Li Z(3), He W(3), Li Y(4), Ma J(1), 
+Wang L(1), Wu Z(5).
+
+Author information:
+(1)Department of Neurosurgery, Beijing Tiantan Hospital, Capital Medical 
+University, Nansihuanxilu 119, Fengtai District, Beijing, 100070, China.
+(2)Department of Neurosurgery, Beijing Tiantan Hospital, Capital Medical 
+University, Nansihuanxilu 119, Fengtai District, Beijing, 100070, China. 
+wangke@bjtth.org.
+(3)China National Clinical Research Center for Neurological Diseases, Beijing, 
+China.
+(4)Department of Neurosurgery, Tianjin Medical University General Hospital, 
+TianJin, China.
+(5)Department of Neurosurgery, Beijing Tiantan Hospital, Capital Medical 
+University, Nansihuanxilu 119, Fengtai District, Beijing, 100070, China. 
+wuzhen1966@aliyun.com.
+
+BACKGROUND: The function and regulation of miRNAs in progression of chordoma 
+were unclear.
+METHODS: Five miRNAs were identified by the machine learning method from the 
+miRNA expression array. CCk-8 assay, EDU assay, wound healing migration assay, 
+and trans-well assay were used to reveal the effect of the miRNAs in chordoma 
+cell lines. Moreover, bioinformation analysis and the mRNA expression array 
+between the primary chordomas and recurrent chordomas were used to find the 
+target protein genes of miRNAs. Furthermore, qRT-PCR and luciferase reporter 
+assay were used to verify the result.
+RESULTS: miR-186-5p, miR-30c-5p, miR-151b, and miR-125b-5p could inhibit 
+proliferation, migration, and invasion of chordoma while miR-1260a enhances 
+proliferation, migration, and invasion of chordoma. Recurrent chordoma has a 
+worse disease-free outcome than the primary chordoma patients. AMOT, NPTX1, 
+RYR3, and P2RX5 were the target protein mRNAs of miR-186-5p; NPTX1 was the 
+target protein mRNAs of miR-125b-5p; and AMOT and TNFSF14 were the target 
+protein mRNAs of miR-1260a.
+CONCLUSIONS: miR-186-5p, miR-125b-5p, miR-1260a, and their target protein mRNAs 
+including AMOT, NPTX1, RYR3, P2RX5, TNFSF14 may be the basement of chordoma 
+research.
+
+© 2023. The Author(s).
+
+DOI: 10.1186/s12885-023-11238-x
+PMCID: PMC10680222
+PMID: 38012562 [Indexed for MEDLINE]
+
+Conflict of interest statement: All authors pronounce that there are no any 
+commercial or financial relationships that could be interpreted as a potential 
+conflict of interest. The authors declare no competing interests.
+
+
+10. Int J Mol Sci. 2023 Aug 9;24(16):12598. doi: 10.3390/ijms241612598.
+
+Sex-Dependent Altered Expression of Cannabinoid Signaling in Hippocampal 
+Astrocytes of the Triple Transgenic Mouse Model of Alzheimer's Disease: 
+Implications for Controlling Astroglial Activity.
+
+Pacheco-Sánchez B(1), Tovar R(1), Ben Rabaa M(1)(2), Sánchez-Salido L(1), Vargas 
+A(1), Suárez J(1)(3), Rodríguez de Fonseca F(1), Rivera P(1).
+
+Author information:
+(1)Unidad de Gestión Clínica de Salud Mental, Instituto de Investigación 
+Biomédica de Málaga y Plataforma en Nanomedicina-IBIMA Plataforma BIONAND, 
+Hospital Universitario Regional de Málaga, 29010 Málaga, Spain.
+(2)Molecular Biotechnology, FH Campus Wien, University for Applied Sciences, 
+Favoritenstraße 222, 1100 Vienna, Austria.
+(3)Departamento de Anatomía Humana, Medicina Legal e Historia de la Ciencia, 
+Universidad de Málaga, 29010 Málaga, Spain.
+
+Alzheimer's disease (AD) is a common neurodegenerative disease. In AD-associated 
+neuroinflammation, astrocytes play a key role, finding glial activation both in 
+patients and in animal models. The endocannabinoid system (ECS) is a neurolipid 
+signaling system with anti-inflammatory and neuroprotective properties 
+implicated in AD. Astrocytes respond to external cannabinoid signals and also 
+have their own cannabinoid signaling. Our main objective is to describe the 
+cannabinoid signaling machinery present in hippocampal astrocytes from 3×Tg-AD 
+mice to determine if they are actively involved in the neurodegenerative 
+process. Primary cultures of astrocytes from the hippocampus of 3×Tg-AD and 
+non-Tg offspring were carried out. We analyzed the gene expression of 
+astrogliosis markers, the main components of the ECS and Ca2+ signaling. 3×Tg-AD 
+hippocampal astrocytes show low inflammatory activity (Il1b, Il6, and Gls) and 
+Ca2+ flow (P2rx5 and Mcu), associated with low cannabinoid signaling (Cnr1 and 
+Cnr2). These results were more evident in females. Our study corroborates glial 
+involvement in AD pathology, in which cannabinoid signaling plays an important 
+role. 3×Tg-AD mice born with hippocampal astrocytes with differential gene 
+expression of the ECS associated with an innate attenuation of their activity. 
+In addition, we show that there are sex differences from birth in this AD 
+animal, which should be considered when investigating the pathogenesis of the 
+disease.
+
+DOI: 10.3390/ijms241612598
+PMCID: PMC10454447
+PMID: 37628778 [Indexed for MEDLINE]
+
+Conflict of interest statement: The authors declare no conflict of interest.

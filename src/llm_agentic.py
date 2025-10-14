@@ -9,12 +9,35 @@ from pathlib import Path
 from agentic_framework import run_agentic_analysis
 
 
-def read_gene_list(gene_file="../gene_list.txt"):
-    """Read gene list from file"""
+def read_gene_list(gene_file="../gene_list.json"):
+    """Read gene list from JSON file"""
+    import json
     try:
         with open(gene_file, "r", encoding="utf-8") as f:
-            genes = [line.strip() for line in f if line.strip()]
-        return genes
+            content = f.read().strip()
+            # Handle both single object and array of objects
+            if content.startswith('['):
+                gene_data = json.loads(content)
+            else:
+                # Single line JSON objects
+                gene_data = []
+                for line in content.split('\n'):
+                    line = line.strip()
+                    if line and not line.startswith('#'):
+                        try:
+                            gene_data.append(json.loads(line))
+                        except json.JSONDecodeError:
+                            continue
+        
+        # Extract gene names and metadata
+        genes_info = []
+        for item in gene_data:
+            if isinstance(item, dict) and 'gene_name' in item:
+                genes_info.append(item)
+            elif isinstance(item, str):
+                genes_info.append({'gene_name': item})
+        
+        return genes_info
     except FileNotFoundError:
         print(f"❌ Gene list file not found: {gene_file}")
         return []
@@ -37,19 +60,31 @@ def main():
     print("="*70)
     
     # Read gene list
-    genes = read_gene_list()
-    if not genes:
+    genes_info = read_gene_list()
+    if not genes_info:
         print("\n❌ No genes to analyze")
         return
     
-    print(f"\n📋 Found {len(genes)} genes to analyze: {', '.join(genes)}")
+    gene_names = [g['gene_name'] for g in genes_info]
+    print(f"\n📋 Found {len(genes_info)} genes to analyze: {', '.join(gene_names)}")
+    
+    # Show additional metadata if available
+    for gene_info in genes_info:
+        if 'disease' in gene_info or 'variant_id' in gene_info:
+            print(f"   • {gene_info['gene_name']}: ", end="")
+            if 'disease' in gene_info:
+                print(f"disease={gene_info['disease']} ", end="")
+            if 'variant_id' in gene_info:
+                print(f"variant={gene_info['variant_id']}", end="")
+            print()
     
     # Analyze each gene with agentic framework
     all_results = []
     
-    for i, gene in enumerate(genes, 1):
+    for i, gene_info in enumerate(genes_info, 1):
+        gene = gene_info['gene_name']
         print(f"\n\n{'#'*70}")
-        print(f"# GENE {i}/{len(genes)}: {gene}")
+        print(f"# GENE {i}/{len(genes_info)}: {gene}")
         print(f"{'#'*70}\n")
         
         try:
@@ -74,7 +109,7 @@ def main():
             continue
         
         # Delay between genes
-        if i < len(genes):
+        if i < len(genes_info):
             print(f"\n⏳ Waiting 3 seconds before next gene...")
             time.sleep(3)
     
@@ -82,7 +117,7 @@ def main():
     print(f"\n\n{'='*70}")
     print("🎉 ALL ANALYSES COMPLETE")
     print(f"{'='*70}")
-    print(f"   Total Genes Analyzed: {len(all_results)}/{len(genes)}")
+    print(f"   Total Genes Analyzed: {len(all_results)}/{len(genes_info)}")
     
     if all_results:
         avg_quality = sum(r['metadata']['final_quality_score'] for r in all_results) / len(all_results)

@@ -150,16 +150,30 @@ class AgenticOrchestrator:
             }
     
     def _literature_retrieval_agent(self, task: str) -> str:
-        """Execute literature retrieval"""
-        pubmed_file = self.results_dir / f"{self.gene_name.lower()}_pubmed_response.txt"
+        """Execute comprehensive literature retrieval from multiple sources"""
+        from literature_retrieval import comprehensive_literature_search
         
-        if pubmed_file.exists():
-            with open(pubmed_file, 'r', encoding='utf-8') as f:
-                content = f.read()
-            return f"✅ Loaded existing PubMed literature ({len(content)} chars)"
+        # Check if comprehensive search already done
+        comp_file = self.results_dir / f"{self.gene_name.lower()}_comprehensive_literature.json"
+        
+        if comp_file.exists():
+            with open(comp_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            sources_found = [s for s in data.get('sources', {}).keys() 
+                           if data['sources'][s].get('status') == 'success']
+            return f"✅ Loaded comprehensive literature from {len(sources_found)} sources: {', '.join(sources_found)}"
         else:
-            # Literature file doesn't exist - suggest running generate_pubmed_response.py
-            return f"⚠️ PubMed literature not found for {self.gene_name}. Run 'python generate_pubmed_response.py' first."
+            # Perform new comprehensive search
+            try:
+                gene_info = {'gene_name': self.gene_name}
+                result = comprehensive_literature_search(gene_info, self.results_dir)
+                
+                sources_found = [s for s in result.get('sources', {}).keys() 
+                               if result['sources'][s].get('status') == 'success']
+                return f"✅ Retrieved literature from {len(sources_found)} sources: {', '.join(sources_found)}"
+            except Exception as e:
+                return f"⚠️ Literature retrieval error: {e}"
     
     def _rag_analysis_agent(self, task: str) -> str:
         """Execute RAG analysis with FAISS"""
