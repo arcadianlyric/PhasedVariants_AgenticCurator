@@ -191,51 +191,26 @@ Data input as the output phased.vcf.gz from [cWGS](https://github.com/Complete-G
 
 ### References  
 
-**Variant Calling & Phasing:**
-
 1. [VEP](https://www.ensembl.org/vep) - Variant Effect Predictor
-
 2. [CWGS](https://github.com/CGI-stLFR/CompleteWGS) - Complete WGS pipeline
-
 3. [stLFR](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6499310/) - Co-barcoded NGS reads
-
 4. [Lariat](https://github.com/10XGenomics/lariat) - Linked-Read Alignment Tool
-
 5. [DeepVariant](https://github.com/google/deepvariant) - Deep learning-based variant caller
-
 6. [Hapcut2](https://github.com/vibansal/HapCUT2) - Haplotype phasing
-
-**Knowledge & Literature:**
-
 7. [PubMed](https://pubmed.ncbi.nlm.nih.gov/) - Biomedical literature database
-
 8. [Wikipedia](https://www.wikipedia.org/) - Free encyclopedia
-
 9. [arXiv](https://arxiv.org/) - Preprint repository
-
 10. [ClinVar](https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/) - Variant summary
-
 11. [PrimeKG](https://zitniklab.hms.harvard.edu/projects/PrimeKG/) - Knowledge graph
-
-**AI & ML Frameworks:**
-
 12. [FAISS](https://github.com/facebookresearch/faiss) - Vector similarity search
-
 13. [Langchain](https://github.com/hwchase17/langchain) - LLM application framework
-
 14. [DeepSeek](https://deepseek.com/) - Large language model
-
 15. [Sentence Transformers](https://www.sbert.net/) - Text embeddings
-
-**Agentic AI Inspiration:**
-
 16. [Agentic AI](https://github.com/coursera/agentic-ai-public) - Multi-agent patterns
-
 17. [LangGraph](https://github.com/langchain-ai/langgraph) - Agent orchestration
 
+
 **Utilities:**
-
 18. [liftOver](http://hgdownload.cse.ucsc.edu/goldenPath/hg38/liftOver/) - Genome coordinate conversion
-
 19. [HuggingFace](https://huggingface.co/) - Model hub and transformers
 
