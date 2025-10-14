@@ -152,18 +152,6 @@ This agentic approach transforms manual variant curation into an intelligent, se
 
 ---
 
-### 📚 Documentation
-
-**Quick Start Guides:**
-- [QUICKSTART_AGENTIC.md](QUICKSTART_AGENTIC.md) - Get started in 5 minutes
-- [MULTI_SOURCE_LITERATURE_GUIDE.md](MULTI_SOURCE_LITERATURE_GUIDE.md) - Multi-source retrieval guide
-- [PROGRESSIVE_SEARCH_STRATEGY.md](PROGRESSIVE_SEARCH_STRATEGY.md) - Progressive search explained
-
-**Detailed Documentation:**
-- [AGENTIC_COMPARISON.md](AGENTIC_COMPARISON.md) - Agentic vs Basic RAG comparison
-- [AGENTIC_IMPLEMENTATION_SUMMARY.md](AGENTIC_IMPLEMENTATION_SUMMARY.md) - Implementation details
-- [UPDATE_SUMMARY.md](UPDATE_SUMMARY.md) - Recent updates and changes
-- [TEST_RESULTS.md](TEST_RESULTS.md) - Test results and validation
 
 **Performance:**
 - Agentic analysis: ~100s per gene, Quality: 6-9/10
@@ -193,15 +181,7 @@ Data input as the output phased.vcf.gz from [cWGS](https://github.com/Complete-G
 4. **LLM Framework**: [Langchain](https://github.com/hwchase17/langchain)
 5. **LLM Model**: [DeepSeek](https://deepseek.com/)
 6. **Environment**: Set environment.yml
-
-**Dependencies:**
-```bash
-pip install wikipedia          # Wikipedia API
-pip install biopython          # PubMed Entrez
-pip install langchain          # RAG framework
-pip install faiss-cpu          # Vector store
-pip install sentence-transformers  # Embeddings
-```  
+ 
 
 ### On Going  
 1. Improve Pubmed, ClinVar based variant curation with LLM RAG  
