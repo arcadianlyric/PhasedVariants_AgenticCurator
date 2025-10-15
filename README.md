@@ -6,7 +6,7 @@ However, interpreting the results – detailed gene functions and variant impact
 To automate this interpretation, building on the foundation of high-quality phased data, we have designed an agentic workflow, enhanced with a RAG-Enhanced LLM Agent.  
 
 ### Keywords
-Agentic AI, Multi-Agent Systems, Planning & Reflection, LLM, RAG/Langchain, FAISS, Haplotype Phasing, Gene/Variant Curation, Knowledge Graph, Multi-Source Literature Retrieval (PubMed + Wikipedia + arXiv), Progressive Search Strategy      
+Agentic AI, Multi-Agent Systems, Planning & Reflection, LLM, RAG/Langchain, FAISS, Haplotype Phasing, Gene/Variant Curation, Knowledge Graph, Multi-Source Literature Retrieval (PubMed + GeneCards + arXiv), Progressive Search Strategy      
 
 ### Results
 1. Explore phased VCF, get variants with VEP HIGH impact on both copies, get gene networks connected by diseases, phenotypes and pathways by querying knowledge graph.  
@@ -39,7 +39,7 @@ User select genes of interest from the gene network, create gene_list.json for n
 ```bash
 # 🌟 NEW: Comprehensive literature search from 3 sources
 # - PubMed: Biomedical abstracts
-# - Wikipedia: Gene function and structure
+# - GeneCards: Comprehensive gene database (function, aliases, pathways)
 # - arXiv: Computational biology papers
 # Uses progressive search strategy: gene+disease+variant → gene+disease → gene only
 python literature_retrieval.py
@@ -80,7 +80,7 @@ The system implements a **true agentic framework** with planning, reflection, an
 
 **2. Multi-Agent Collaboration**
 Specialized agents work together in a coordinated workflow:
-- **Literature Retrieval Agent**: Multi-source search (PubMed + Wikipedia + arXiv) with progressive strategy
+- **Literature Retrieval Agent**: Multi-source search (PubMed + GeneCards + arXiv) with progressive strategy
 - **Vector Store Agent**: Creates and manages FAISS indices for semantic search
 - **RAG Analysis Agent**: Performs retrieval-augmented generation with context
 - **Knowledge Graph Agent**: Queries gene-disease-pathway relationships from PrimeKG
@@ -120,7 +120,7 @@ Specialized agents work together in a coordinated workflow:
 
 **5. Multi-Source Literature Retrieval**
 - **PubMed**: Peer-reviewed biomedical abstracts (clinical evidence)
-- **Wikipedia**: Curated gene function and protein structure (foundational knowledge)
+- **GeneCards**: Comprehensive gene database (function, aliases, pathways, diseases)
 - **arXiv**: Computational biology preprints (cutting-edge methods)
 - **Progressive Search Strategy**: 
   - Level 1: `gene + disease + variant` (most specific)
@@ -131,7 +131,7 @@ Specialized agents work together in a coordinated workflow:
 **6. Key Advantages Over Basic RAG**
 - ✅ **Planning**: Structured approach vs. ad-hoc queries
 - ✅ **Collaboration**: Multiple specialized agents vs. single monolithic agent
-- ✅ **Multi-Source**: 3 complementary sources vs. PubMed only
+- ✅ **Multi-Source**: 3 complementary sources (PubMed + GeneCards + arXiv) vs. PubMed only
 - ✅ **Progressive Search**: Specific → general with automatic fallback
 - ✅ **Reflection**: Self-assessment and improvement vs. one-shot generation
 - ✅ **Quality Scores**: Quantitative evaluation (0-10 scale) vs. subjective assessment
@@ -170,7 +170,7 @@ Data input as the output phased.vcf.gz from [cWGS](https://github.com/Complete-G
 1. **Knowledge Graph**: [PrimeKG](https://zitniklab.hms.harvard.edu/projects/PrimeKG/) - Download kg.csv to ./db
 2. **Literature Sources**:
    - [PubMed](https://pubmed.ncbi.nlm.nih.gov/) - Biomedical abstracts
-   - [Wikipedia](https://www.wikipedia.org/) - Gene encyclopedia
+   - [GeneCards](https://www.genecards.org/) - Comprehensive gene database
    - [arXiv](https://arxiv.org/) - Computational biology preprints
 3. **Variant Data**: [ClinVar](https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/) - Variant summary
 
@@ -198,7 +198,7 @@ Data input as the output phased.vcf.gz from [cWGS](https://github.com/Complete-G
 5. [DeepVariant](https://github.com/google/deepvariant) - Deep learning-based variant caller
 6. [Hapcut2](https://github.com/vibansal/HapCUT2) - Haplotype phasing
 7. [PubMed](https://pubmed.ncbi.nlm.nih.gov/) - Biomedical literature database
-8. [Wikipedia](https://www.wikipedia.org/) - Free encyclopedia
+8. [GeneCards](https://www.genecards.org/) - Comprehensive gene database
 9. [arXiv](https://arxiv.org/) - Preprint repository
 10. [ClinVar](https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/) - Variant summary
 11. [PrimeKG](https://zitniklab.hms.harvard.edu/projects/PrimeKG/) - Knowledge graph

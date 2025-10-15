@@ -273,9 +273,7 @@ PMID: 40344706 [Indexed for MEDLINE]
 
 Conflict of interest statement: Declaration of competing interest All authors 
 declared that they have no conflicts of interest to this work.
-
-
-6. Prostate Cancer Prostatic Dis. 2025 Sep;28(3):773-781. doi: 
+1. Prostate Cancer Prostatic Dis. 2025 Sep;28(3):773-781. doi: 
 10.1038/s41391-024-00918-9. Epub 2024 Nov 14.
 
 Enhancing risk stratification models in localized prostate cancer by novel 
@@ -348,7 +346,7 @@ performed in compliance with the Declaration of Helsinki and the institutional
 ethics committees approved the study protocol (21-9991-BO and KEK-BE128/2015).
 
 
-7. Adipocyte. 2024 Dec;13(1):2421745. doi: 10.1080/21623945.2024.2421745. Epub
+2. Adipocyte. 2024 Dec;13(1):2421745. doi: 10.1080/21623945.2024.2421745. Epub
 2024  Nov 1.
 
 A key role for P2RX5 in brown adipocyte differentiation and energy homeostasis.
@@ -391,7 +389,7 @@ Conflict of interest statement: No potential conflict of interest was reported
 by the author(s).
 
 
-8. Sci Adv. 2024 May 24;10(21):eadn7655. doi: 10.1126/sciadv.adn7655. Epub 2024
+3. Sci Adv. 2024 May 24;10(21):eadn7655. doi: 10.1126/sciadv.adn7655. Epub 2024
 May  23.
 
 Brain cell-type shifts in Alzheimer's disease, autism, and schizophrenia 
@@ -471,7 +469,7 @@ PMCID: PMC11114225
 PMID: 38781333 [Indexed for MEDLINE]
 
 
-9. BMC Cancer. 2023 Nov 27;23(1):1152. doi: 10.1186/s12885-023-11238-x.
+4. BMC Cancer. 2023 Nov 27;23(1):1152. doi: 10.1186/s12885-023-11238-x.
 
 Function and regulation of miR-186-5p, miR-125b-5p and miR-1260a in chordoma.
 
@@ -523,7 +521,7 @@ commercial or financial relationships that could be interpreted as a potential
 conflict of interest. The authors declare no competing interests.
 
 
-10. Int J Mol Sci. 2023 Aug 9;24(16):12598. doi: 10.3390/ijms241612598.
+5. Int J Mol Sci. 2023 Aug 9;24(16):12598. doi: 10.3390/ijms241612598.
 
 Sex-Dependent Altered Expression of Cannabinoid Signaling in Hippocampal 
 Astrocytes of the Triple Transgenic Mouse Model of Alzheimer's Disease: 

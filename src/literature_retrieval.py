@@ -1,6 +1,6 @@
 """
 Enhanced Literature Retrieval Agent
-Searches PubMed, Wikipedia, and arXiv for gene-related information
+Searches PubMed, GeneCards, and arXiv for gene-related information
 Inspired by Coursera agentic-ai-public/src/research_tools.py
 """
 
@@ -13,15 +13,9 @@ from typing import List, Dict, Optional
 from io import BytesIO
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+from bs4 import BeautifulSoup
 
 # Try to import optional dependencies
-try:
-    import wikipedia
-    WIKIPEDIA_AVAILABLE = True
-except ImportError:
-    WIKIPEDIA_AVAILABLE = False
-    print("⚠️ wikipedia package not installed. Run: pip install wikipedia")
-
 try:
     from pdfminer.high_level import extract_text_to_fp
     PDF_EXTRACTION_AVAILABLE = True
@@ -58,63 +52,75 @@ def _build_session(user_agent: str = "GeneAnalysis/1.0") -> requests.Session:
 session = _build_session()
 
 
-def wikipedia_search(query: str, sentences: int = 5, fallback_queries: List[str] = None) -> List[Dict]:
+def genecards_search(gene_name: str, fallback_queries: List[str] = None) -> List[Dict]:
     """
-    Search Wikipedia for gene information with fallback queries
+    Search GeneCards for gene information
+    GeneCards is a comprehensive database of human genes
     
     Args:
-        query: Primary search query
-        sentences: Number of sentences in summary
-        fallback_queries: List of fallback queries if primary fails
+        gene_name: Gene name to search
+        fallback_queries: List of fallback gene names if primary fails
     
     Returns:
-        List of dictionaries with title, summary, url
+        List of dictionaries with gene information from GeneCards
     """
-    if not WIKIPEDIA_AVAILABLE:
-        return [{"error": "wikipedia package not installed"}]
-    
-    queries_to_try = [query]
+    queries_to_try = [gene_name]
     if fallback_queries:
         queries_to_try.extend(fallback_queries)
     
-    for q in queries_to_try:
+    for gene in queries_to_try:
         try:
-            # Search for the page
-            search_results = wikipedia.search(q)
-            if not search_results:
-                continue
+            # GeneCards URL format
+            url = f"https://www.genecards.org/cgi-bin/carddisp.pl?gene={gene}"
             
-            page_title = search_results[0]
-            page = wikipedia.page(page_title, auto_suggest=False)
-            summary = wikipedia.summary(page_title, sentences=sentences, auto_suggest=False)
+            # Fetch the page
+            response = session.get(url, timeout=30)
+            response.raise_for_status()
             
-            return [{
-                "source": "Wikipedia",
-                "title": page.title,
-                "summary": summary,
-                "url": page.url,
-                "full_text": page.content[:3000],  # First 3000 chars
-                "query_used": q
-            }]
-        except wikipedia.exceptions.DisambiguationError as e:
-            # Try the first option
-            try:
-                page = wikipedia.page(e.options[0], auto_suggest=False)
-                summary = wikipedia.summary(e.options[0], sentences=sentences, auto_suggest=False)
+            # Parse HTML
+            soup = BeautifulSoup(response.content, 'html.parser')
+            
+            # Extract gene summary
+            summary = ""
+            
+            # Try to find the gene summary section
+            summary_section = soup.find('div', {'id': 'summaries'})
+            if summary_section:
+                # Get text from summary paragraphs
+                paragraphs = summary_section.find_all('p', limit=3)
+                summary = ' '.join([p.get_text(strip=True) for p in paragraphs])
+            
+            # If no summary found, try alternative selectors
+            if not summary:
+                # Try gene description
+                desc = soup.find('div', class_='gc-subsection')
+                if desc:
+                    summary = desc.get_text(strip=True)[:1000]
+            
+            # Extract gene aliases
+            aliases = []
+            alias_section = soup.find('div', {'id': 'aliases'})
+            if alias_section:
+                alias_text = alias_section.get_text(strip=True)
+                aliases = [a.strip() for a in alias_text.split(',')[:5]]
+            
+            # If we got some content, return it
+            if summary or response.status_code == 200:
                 return [{
-                    "source": "Wikipedia",
-                    "title": page.title,
-                    "summary": summary,
-                    "url": page.url,
-                    "full_text": page.content[:3000],
-                    "query_used": q
+                    "source": "GeneCards",
+                    "gene_name": gene,
+                    "url": url,
+                    "summary": summary[:2000] if summary else f"GeneCards entry for {gene}",
+                    "aliases": aliases,
+                    "query_used": gene
                 }]
-            except:
-                continue
+            
+        except requests.exceptions.RequestException:
+            continue
         except Exception:
             continue
     
-    return [{"error": f"No Wikipedia results for any query: {queries_to_try}"}]
+    return [{"error": f"No GeneCards results for any query: {queries_to_try}"}]
 
 
 def arxiv_search(query: str, max_results: int = 3, fallback_queries: List[str] = None) -> List[Dict]:
@@ -190,19 +196,21 @@ def arxiv_search(query: str, max_results: int = 3, fallback_queries: List[str] =
     return [{"error": f"No arXiv results for any query: {queries_to_try}"}]
 
 
-def pubmed_search(gene_name: str, max_results: int = 10) -> str:
+def pubmed_search(gene_name: str, max_results: int = 10, max_retries: int = 3) -> str:
     """
-    Search PubMed for gene literature (existing functionality)
+    Search PubMed for gene literature with retry mechanism
     
     Args:
         gene_name: Gene name to search
         max_results: Maximum number of results
+        max_retries: Maximum number of retry attempts
     
     Returns:
         Path to saved PubMed results file
     """
     from Bio import Entrez
     import json
+    from http.client import IncompleteRead
     
     # Load settings
     settings_file = Path(__file__).parent.parent / "setting.json"
@@ -210,36 +218,80 @@ def pubmed_search(gene_name: str, max_results: int = 10) -> str:
         settings = json.load(f)
     Entrez.email = settings["email"]
     
-    # Search PubMed
-    query = f"{gene_name}[Gene Name] OR {gene_name}[Title/Abstract]"
-    handle = Entrez.esearch(db="pubmed", term=query, retmax=max_results)
-    record = Entrez.read(handle)
-    handle.close()
-    pmids = record["IdList"]
+    # Search PubMed with retry
+    for attempt in range(max_retries):
+        try:
+            query = f"{gene_name}[Gene Name] OR {gene_name}[Title/Abstract]"
+            handle = Entrez.esearch(db="pubmed", term=query, retmax=max_results)
+            record = Entrez.read(handle)
+            handle.close()
+            pmids = record["IdList"]
+            
+            if not pmids:
+                return None
+            
+            # Fetch abstracts with retry and chunking
+            abstracts_list = []
+            
+            # Fetch in smaller batches to avoid IncompleteRead
+            batch_size = 5
+            for i in range(0, len(pmids), batch_size):
+                batch_pmids = pmids[i:i+batch_size]
+                
+                for fetch_attempt in range(max_retries):
+                    try:
+                        handle = Entrez.efetch(
+                            db="pubmed", 
+                            id=batch_pmids, 
+                            rettype="abstract", 
+                            retmode="text"
+                        )
+                        batch_abstracts = handle.read()
+                        handle.close()
+                        abstracts_list.append(batch_abstracts)
+                        break  # Success, exit retry loop
+                    except (IncompleteRead, Exception) as e:
+                        if fetch_attempt < max_retries - 1:
+                            time.sleep(2)  # Wait before retry
+                            continue
+                        else:
+                            # Last attempt failed, log and continue
+                            abstracts_list.append(f"\n[Error fetching batch {i//batch_size + 1}: {str(e)}]\n")
+                
+                time.sleep(0.5)  # Rate limiting between batches
+            
+            # Combine all abstracts
+            abstracts = "\n".join(abstracts_list)
+            
+            # Save to file
+            results_dir = Path(__file__).parent.parent / "results"
+            results_dir.mkdir(exist_ok=True)
+            output_file = results_dir / f"{gene_name.lower()}_pubmed_response.txt"
+            
+            with open(output_file, "w", encoding="utf-8") as f:
+                f.write(f"# PubMed Search Results for: {gene_name}\n")
+                f.write(f"# Found {len(pmids)} articles\n")
+                f.write("# " + "="*50 + "\n\n")
+                f.write(abstracts)
+            
+            return str(output_file)
+            
+        except Exception as e:
+            if attempt < max_retries - 1:
+                time.sleep(2)
+                continue
+            else:
+                raise e
     
-    if not pmids:
-        return None
-    
-    # Fetch abstracts
-    handle = Entrez.efetch(db="pubmed", id=pmids, rettype="abstract", retmode="text")
-    abstracts = handle.read()
-    handle.close()
-    
-    # Save to file
-    results_dir = Path(__file__).parent.parent / "results"
-    results_dir.mkdir(exist_ok=True)
-    output_file = results_dir / f"{gene_name.lower()}_pubmed_response.txt"
-    
-    with open(output_file, "w", encoding="utf-8") as f:
-        f.write(f"# PubMed Search Results for: {gene_name}\n")
-        f.write(f"# Found {len(pmids)} articles\n")
-        f.write("# " + "="*50 + "\n\n")
-        f.write(abstracts)
-    
-    return str(output_file)
+    return None
 
 
-def comprehensive_literature_search(gene_info: Dict, output_dir: Path = None) -> Dict:
+def comprehensive_literature_search(
+    gene_info: Dict, 
+    output_dir: Path = None,
+    pubmed_max: int = 10,
+    arxiv_max: int = 10
+) -> Dict:
     """
     Perform comprehensive literature search across multiple sources
     Uses progressive search strategy: most specific → less specific
@@ -247,6 +299,8 @@ def comprehensive_literature_search(gene_info: Dict, output_dir: Path = None) ->
     Args:
         gene_info: Dictionary with gene_name, disease, variant_id, etc.
         output_dir: Directory to save results
+        pubmed_max: Maximum PubMed results (default: 10)
+        arxiv_max: Maximum arXiv results (default: 10)
     
     Returns:
         Dictionary with results from all sources
@@ -297,7 +351,7 @@ def comprehensive_literature_search(gene_info: Dict, output_dir: Path = None) ->
     # 1. PubMed Search
     print(f"\n📚 Searching PubMed...")
     try:
-        pubmed_file = pubmed_search(gene_name, max_results=10)
+        pubmed_file = pubmed_search(gene_name, max_results=pubmed_max)
         if pubmed_file:
             results["sources"]["pubmed"] = {
                 "status": "success",
@@ -313,35 +367,36 @@ def comprehensive_literature_search(gene_info: Dict, output_dir: Path = None) ->
     
     time.sleep(1)  # Rate limiting
     
-    # 2. Wikipedia Search (progressive strategy)
-    print(f"\n📖 Searching Wikipedia...")
+    # 2. GeneCards Search
+    print(f"\n📖 Searching GeneCards...")
     try:
-        # Wikipedia fallback: try gene-specific queries
-        wiki_fallback = [f"{gene_name} gene", f"{gene_name} protein", f"{gene_name}"]
-        wiki_results = wikipedia_search(search_queries[0], fallback_queries=wiki_fallback)
+        # GeneCards fallback: try gene name variations
+        genecards_fallback = [gene_name.upper(), gene_name.lower()]
+        genecards_results = genecards_search(gene_name, fallback_queries=genecards_fallback)
         
-        if wiki_results and "error" not in wiki_results[0]:
-            results["sources"]["wikipedia"] = {
+        if genecards_results and "error" not in genecards_results[0]:
+            results["sources"]["genecards"] = {
                 "status": "success",
-                "data": wiki_results,
-                "query_used": wiki_results[0].get('query_used', search_queries[0])
+                "data": genecards_results,
+                "query_used": genecards_results[0].get('query_used', gene_name)
             }
-            print(f"   ✅ Wikipedia: Found '{wiki_results[0]['title']}'")
-            print(f"      Query: '{wiki_results[0].get('query_used', 'N/A')}'")
+            print(f"   ✅ GeneCards: Found '{genecards_results[0]['gene_name']}'")
+            if genecards_results[0].get('aliases'):
+                print(f"      Aliases: {', '.join(genecards_results[0]['aliases'][:3])}")
         else:
-            results["sources"]["wikipedia"] = {"status": "no_results"}
-            print(f"   ⚠️ Wikipedia: No results")
+            results["sources"]["genecards"] = {"status": "no_results"}
+            print(f"   ⚠️ GeneCards: No results")
     except Exception as e:
-        results["sources"]["wikipedia"] = {"status": "error", "message": str(e)}
-        print(f"   ❌ Wikipedia: {e}")
+        results["sources"]["genecards"] = {"status": "error", "message": str(e)}
+        print(f"   ❌ GeneCards: {e}")
     
     time.sleep(1)  # Rate limiting
     
     # 3. arXiv Search (progressive strategy)
     print(f"\n📄 Searching arXiv...")
     try:
-        # Use progressive search queries
-        arxiv_results = arxiv_search(search_queries[0], max_results=3, fallback_queries=search_queries[1:])
+        # Use progressive search queries with configurable max results
+        arxiv_results = arxiv_search(search_queries[0], max_results=arxiv_max, fallback_queries=search_queries[1:])
         
         if arxiv_results and "error" not in arxiv_results[0]:
             results["sources"]["arxiv"] = {

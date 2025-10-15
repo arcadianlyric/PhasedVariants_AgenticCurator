@@ -13,19 +13,19 @@
       "status": "success",
       "file": "/Users/yc/Documents/GitHub/llm_genetics_assistant/results/p2rx5_pubmed_response.txt"
     },
-    "wikipedia": {
+    "genecards": {
       "status": "success",
       "data": [
         {
-          "source": "Wikipedia",
-          "title": "P2RX5",
-          "summary": "P2X purinoceptor 5 is a protein in humans that is encoded by the P2RX5 gene.\nThe product of this gene belongs to the family of purinoceptors for ATP. This receptor functions as a ligand-gated ion channel. Several characteristic motifs of ATP-gated channels are present in its primary structure, but, unlike other members of the purinoceptors family, this receptor has only a single transmembrane domain. Four transcript variants encoding distinct isoforms have been identified for this gene.\n\n\n== See also ==\nP2X receptor\n\n\n== References ==\n\n\n== Further reading ==\n\n\n== External links ==\nP2RX5+protein,+human at the U.S. National Library of Medicine Medical Subject Headings (MeSH)\nThis article incorporates text from the United States National Library of Medicine, which is in the public domain.",
-          "url": "https://en.wikipedia.org/wiki/P2RX5",
-          "full_text": "P2X purinoceptor 5 is a protein in humans that is encoded by the P2RX5 gene.\nThe product of this gene belongs to the family of purinoceptors for ATP. This receptor functions as a ligand-gated ion channel. Several characteristic motifs of ATP-gated channels are present in its primary structure, but, unlike other members of the purinoceptors family, this receptor has only a single transmembrane domain. Four transcript variants encoding distinct isoforms have been identified for this gene.\n\n\n== See also ==\nP2X receptor\n\n\n== References ==\n\n\n== Further reading ==\n\n\n== External links ==\nP2RX5+protein,+human at the U.S. National Library of Medicine Medical Subject Headings (MeSH)\nThis article incorporates text from the United States National Library of Medicine, which is in the public domain.",
-          "query_used": "P2RX5 gene"
+          "source": "GeneCards",
+          "gene_name": "P2RX5",
+          "url": "https://www.genecards.org/cgi-bin/carddisp.pl?gene=P2RX5",
+          "summary": "The product of this gene belongs to the family of purinoceptors for ATP. This receptor functions as a ligand-gated ion channel. Alternative splicing results in multiple transcript variants. Read-through transcription also exists between this gene and the neighboring downstream gene, TAX1BP3 (Tax1 binding protein 3). [provided by RefSeq, Mar 2011]See more...",
+          "aliases": [],
+          "query_used": "P2RX5"
         }
       ],
-      "query_used": "P2RX5 gene"
+      "query_used": "P2RX5"
     },
     "arxiv": {
       "status": "success",
@@ -69,6 +69,103 @@
           "url": "http://arxiv.org/abs/2507.21714v1",
           "summary": "Cancer data, particularly cancer incidence and mortality, are fundamental to\nunderstand the cancer burden, to set targets for cancer control and to evaluate\nthe evolution of the implementation of a cancer control policy. However, the\ncomplexity of data collection, classification, validation and processing result\nin cancer incidence figures often lagging two to three years behind the\ncalendar year. In response, national or regional population-based cancer\nregistries (PBCRs) are increasingly interested in methods for forecasting\ncancer incidence. However, in many countries there is an additional difficulty\nin projecting cancer incidence as regional registries are usually not\nestablished in the same year and therefore cancer incidence data series between\ndifferent regions of a country are not harmonised over time. This study\naddresses the challenge of forecasting cancer incidence with incomplete data at\nboth regional and national levels. To achieve our objective, we propose the use\nof multivariate spatio-temporal shared component models that jointly model\nmortality data and available cancer incidence data. The performance of these\nmultivariate models are analyzed using lung cancer incidence data, together\nwith the number of deaths reported in England in the period 2001-2019.\nDifferent model predictive measures have been calculated to select the best\nmodel.",
           "link_pdf": "http://arxiv.org/pdf/2507.21714v1",
+          "query_used": "P2RX5 cancer rs2142993306"
+        },
+        {
+          "source": "arXiv",
+          "title": "Cancer Networks: A general theoretical and computational framework for\n  understanding cancer",
+          "authors": [
+            "Eric Werner"
+          ],
+          "published": "2011-10-26",
+          "url": "http://arxiv.org/abs/1110.5865v1",
+          "summary": "We present a general computational theory of cancer and its developmental\ndynamics. The theory is based on a theory of the architecture and function of\ndevelopmental control networks which guide the formation of multicellular\norganisms. Cancer networks are special cases of developmental control networks.\nCancer results from transformations of normal developmental networks. Our\ntheory generates a natural classification of all possible cancers based on\ntheir network architecture. Each cancer network has a unique topology and\nsemantics and developmental dynamics that result in distinct clinical tumor\nphenotypes. We apply this new theory with a series of proof of concept cases\nfor all the basic cancer types. These cases have been computationally modeled,\ntheir behavior simulated and mathematically described using a multicellular\nsystems biology approach. There are fascinating correspondences between the\ndynamic developmental phenotype of computationally modeled {\\em in silico}\ncancers and natural {\\em in vivo} cancers. The theory lays the foundation for a\nnew research paradigm for understanding and investigating cancer. The theory of\ncancer networks implies that new diagnostic methods and new treatments to cure\ncancer will become possible.",
+          "link_pdf": "http://arxiv.org/pdf/1110.5865v1",
+          "query_used": "P2RX5 cancer rs2142993306"
+        },
+        {
+          "source": "arXiv",
+          "title": "On a fundamental problem in the analysis of cancer registry data",
+          "authors": [
+            "Sho Komukai",
+            "Satoshi Hattori",
+            "Bernard Rachet"
+          ],
+          "published": "2023-03-16",
+          "url": "http://arxiv.org/abs/2303.09141v1",
+          "summary": "In epidemiology research with cancer registry data, it is often of primary\ninterest to make inference on cancer death, not overall survival. Since cause\nof death is not easy to collect or is not necessarily reliable in cancer\nregistries, some special methodologies have been introduced and widely used by\nusing the concepts of the relative survival ratio and the net survival. In\nmaking inference of those measures, external life tables of the general\npopulation are utilized to adjust the impact of non-cancer death on overall\nsurvival. The validity of this adjustment relies on the assumption that\nmortality in the external life table approximates non-cancer mortality of\ncancer patients. However, the population used to calculate a life table may\ninclude cancer death and cancer patients. Sensitivity analysis proposed by\nTalb\\\"{a}ck and Dickman to address it requires additional information which is\noften not easily available. We propose a method to make inference on the net\nsurvival accounting for potential presence of cancer patients and cancer death\nin the life table for the general population. The idea of adjustment is to\nconsider correspondence of cancer mortality in the life table and that in the\ncancer registry. We realize a novel method to adjust cancer mortality in the\ncancer registry without any additional information to the standard analyses of\ncancer registries. Our simulation study revealed that the proposed method\nsuccessfully removed the bias. We illustrate the proposed method with the\ncancer registry data in England.",
+          "link_pdf": "http://arxiv.org/pdf/2303.09141v1",
+          "query_used": "P2RX5 cancer rs2142993306"
+        },
+        {
+          "source": "arXiv",
+          "title": "Understanding genomic alterations in cancer genomes using an integrative\n  network approach",
+          "authors": [
+            "Edwin Wang"
+          ],
+          "published": "2014-09-10",
+          "url": "http://arxiv.org/abs/1409.3263v1",
+          "summary": "In recent years, cancer genome sequencing and other high-throughput studies\nof cancer genomes have generated many notable discoveries. In this review,\nNovel genomic alteration mechanisms, such as chromothripsis (chromosomal\ncrisis) and kataegis (mutation storms), and their implications for cancer are\ndiscussed. Genomic alterations spur cancer genome evolution. Thus, the\nrelationship between cancer clonal evolution and cancer stems cells is\ncommented. The key question in cancer biology concerns how these genomic\nalterations support cancer development and metastasis in the context of\nbiological functioning. Thus far, efforts such as pathway analysis have\nimproved the understanding of the functional contributions of genetic mutations\nand DNA copy number variations to cancer development, progression and\nmetastasis. However, the known pathways correspond to a small fraction,\nplausibly 5-10%, of somatic mutations and genes with an altered copy number. To\ndevelop a comprehensive understanding of the function of these genomic\nalterations in cancer, an integrative network framework is proposed and\ndiscussed. Finally, the challenges and the directions of studying cancer omic\ndata using an integrative network approach are commented.",
+          "link_pdf": "http://arxiv.org/pdf/1409.3263v1",
+          "query_used": "P2RX5 cancer rs2142993306"
+        },
+        {
+          "source": "arXiv",
+          "title": "Predictive genomics: A cancer hallmark network framework for predicting\n  tumor clinical phenotypes using genome sequencing data",
+          "authors": [
+            "Edwin Wang",
+            "Naif Zaman",
+            "Shauna Mcgee",
+            "Jean-Sébastien Milanese",
+            "Ali Masoudi-Nejad",
+            "Maureen O'Connor"
+          ],
+          "published": "2014-08-09",
+          "url": "http://arxiv.org/abs/1408.2009v1",
+          "summary": "We discuss a cancer hallmark network framework for modelling\ngenome-sequencing data to predict cancer clonal evolution and associated\nclinical phenotypes. Strategies of using this framework in conjunction with\ngenome sequencing data in an attempt to predict personalized drug targets, drug\nresistance, and metastasis for a cancer patient, as well as cancer risks for a\nhealthy individual are discussed. Accurate prediction of cancer clonal\nevolution and clinical phenotypes will have substantial impact on timely\ndiagnosis, personalized management and prevention of cancer.",
+          "link_pdf": "http://arxiv.org/pdf/1408.2009v1",
+          "query_used": "P2RX5 cancer rs2142993306"
+        },
+        {
+          "source": "arXiv",
+          "title": "Noncoding RNAs serve as the deadliest regulators for cancer",
+          "authors": [
+            "Anyou Wang",
+            "Hai Rong"
+          ],
+          "published": "2019-10-08",
+          "url": "http://arxiv.org/abs/1910.03934v1",
+          "summary": "Cancer is one of the leading causes of human death. Many efforts have made to\nunderstand its mechanism and have further identified many proteins and DNA\nsequence variations as suspected targets for therapy. However, drugs targeting\nthese targets have low success rates, suggesting the basic mechanism still\nremains unclear. Here, we develop a computational software combining Cox\nproportional-hazards model and stability-selection to unearth an overlooked,\nyet the most important cancer drivers hidden in massive data from The Cancer\nGenome Atlas (TCGA), including 11,574 RNAseq samples and clinic data.\nGenerally, noncoding RNAs primarily regulate cancer deaths and work as the\ndeadliest cancer inducers and repressors, in contrast to proteins as\nconventionally thought. Especially, processed-pseudogenes serve as the primary\ncancer inducers, while lincRNA and antisense RNAs dominate the repressors.\nStrikingly, noncoding RNAs serves as the universal strongest regulators for all\ncancer types although personal clinic variables such as alcohol and smoking\nsignificantly alter cancer genome. Furthermore, noncoding RNAs also work as\ncentral hubs in cancer regulatory network and as biomarkers to discriminate\ncancer types. Therefore, noncoding RNAs overall serve as the deadliest cancer\nregulators, which refreshes the basic concept of cancer mechanism and builds a\nnovel basis for cancer research and therapy. Biological functions of\npseudogenes have rarely been recognized. Here we reveal them as the most\nimportant cancer drivers for all cancer types from big data, breaking a wall to\nexplore their biological potentials.",
+          "link_pdf": "http://arxiv.org/pdf/1910.03934v1",
+          "query_used": "P2RX5 cancer rs2142993306"
+        },
+        {
+          "source": "arXiv",
+          "title": "Computational methods for cancer driver discovery: A survey",
+          "authors": [
+            "Vu Viet Hoang Pham",
+            "Lin Liu",
+            "Cameron Bracken",
+            "Gregory Goodall",
+            "Jiuyong Li",
+            "Thuc Duy Le"
+          ],
+          "published": "2020-07-02",
+          "url": "http://arxiv.org/abs/2007.00887v1",
+          "summary": "Motivation: Uncovering the genomic causes of cancer, known as cancer driver\ngenes, is a fundamental task in biomedical research. Cancer driver genes drive\nthe development and progression of cancer, thus identifying cancer driver genes\nand their regulatory mechanism is crucial to the design of cancer treatment and\nintervention. Many computational methods, which take the advantages of computer\nscience and data science, have been developed to utilise multiple types of\ngenomic data to reveal cancer drivers and their regulatory mechanism behind\ncancer development and progression. Due to the complexity of the mechanistic\ninsight of cancer genes in driving cancer and the fast development of the\nfield, it is necessary to have a comprehensive review about the current\ncomputational methods for discovering different types of cancer drivers.\nResults: We survey computational methods for identifying cancer drivers from\ngenomic data. We categorise the methods into three groups, methods for single\ndriver identification, methods for driver module identification, and methods\nfor identifying personalised cancer drivers. We also conduct a case study to\ncompare the performance of the current methods. We further analyse the\nadvantages and limitations of the current methods, and discuss the challenges\nand future directions of the topic. In addition, we investigate the resources\nfor discovering and validating cancer drivers in order to provide a one-stop\nreference of the tools to facilitate cancer driver discovery. The ultimate goal\nof the paper is to help those interested in the topic to establish a solid\nbackground to carry out further research in the field.",
+          "link_pdf": "http://arxiv.org/pdf/2007.00887v1",
+          "query_used": "P2RX5 cancer rs2142993306"
+        },
+        {
+          "source": "arXiv",
+          "title": "Using data mining techniques for diagnosis and prognosis of cancer\n  disease",
+          "authors": [
+            "Shweta Kharya"
+          ],
+          "published": "2012-05-09",
+          "url": "http://arxiv.org/abs/1205.1923v1",
+          "summary": "Breast cancer is one of the leading cancers for women in developed countries\nincluding India. It is the second most common cause of cancer death in women.\nThe high incidence of breast cancer in women has increased significantly in the\nlast years. In this paper we have discussed various data mining approaches that\nhave been utilized for breast cancer diagnosis and prognosis. Breast Cancer\nDiagnosis is distinguishing of benign from malignant breast lumps and Breast\nCancer Prognosis predicts when Breast Cancer is to recur in patients that have\nhad their cancers excised. This study paper summarizes various review and\ntechnical articles on breast cancer diagnosis and prognosis also we focus on\ncurrent research being carried out using the data mining techniques to enhance\nthe breast cancer diagnosis and prognosis.",
+          "link_pdf": "http://arxiv.org/pdf/1205.1923v1",
           "query_used": "P2RX5 cancer rs2142993306"
         }
       ],

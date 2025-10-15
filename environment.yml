@@ -17,4 +17,4 @@ dependencies:
     - langchain
     - faiss-cpu
     - sentence-transformers
-    - wikipedia
+    - beautifulsoup4
