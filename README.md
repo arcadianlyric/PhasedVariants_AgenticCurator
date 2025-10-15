@@ -61,10 +61,10 @@ python llm_agentic.py
 ```
 
 **Example Outputs:**
-- Multi-source literature: `results/{gene}_comprehensive_literature.json`
-- Basic RAG: `results/p2rx5_rag_analysis.json`
-- Agentic analysis: `results/p2rx5_agentic_analysis.json`
-- Agentic report: `results/p2rx5_agentic_report.md`  
+- Multi-source literature: [results/{gene}_comprehensive_literature.json](results/p2rx5_comprehensive_literature.json)
+- Basic RAG: [results/p2rx5_rag_analysis.json](results/p2rx5_rag_analysis.json)
+- Agentic analysis: [results/p2rx5_agentic_analysis.json](results/p2rx5_agentic_analysis.json)
+- Agentic report: [results/p2rx5_agentic_report.md](results/p2rx5_agentic_report.md)  
 
 ### Agentic Architecture
 
