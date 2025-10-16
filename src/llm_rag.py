@@ -28,9 +28,11 @@ def read_gene_list(gene_file="../gene_list.txt"):
         return []
 
 def get_or_create_vector_store(gene_name):
-    """Load or create a FAISS vector store for a specific gene."""
+    """
+    Load or create a FAISS vector store for a specific gene.
+    Now includes: PubMed + GeneCards + arXiv (Tavily is used directly)
+    """
     results_dir = Path("../results")
-    literature_file = results_dir / f"{gene_name.lower()}_pubmed_response.txt"
     vector_store_path = results_dir / f"{gene_name.lower()}_faiss_index"
 
     if vector_store_path.exists():
@@ -39,32 +41,126 @@ def get_or_create_vector_store(gene_name):
         return FAISS.load_local(str(vector_store_path), embeddings, allow_dangerous_deserialization=True)
 
     print(f"🧬 Creating new FAISS index for {gene_name}...")
-    if not literature_file.exists():
-        print(f"⚠️ Literature file not found for {gene_name}. Cannot create index.")
-        return None
-
-    with open(literature_file, "r", encoding="utf-8") as f:
-        text = f.read()
-
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
-    docs = text_splitter.create_documents([text])
     
-    print(f"📄 Split literature into {len(docs)} documents.")
+    # Collect all text sources
+    all_texts = []
+    
+    # 1. PubMed
+    pubmed_file = results_dir / f"{gene_name.lower()}_pubmed_response.txt"
+    if pubmed_file.exists():
+        with open(pubmed_file, "r", encoding="utf-8") as f:
+            pubmed_text = f.read()
+        all_texts.append(("PubMed", pubmed_text))
+        print(f"   ✅ Added PubMed literature")
+    else:
+        print(f"   ⚠️ PubMed file not found")
+    
+    # 2. Comprehensive literature (GeneCards + arXiv)
+    comp_file = results_dir / f"{gene_name.lower()}_comprehensive_literature.json"
+    if comp_file.exists():
+        with open(comp_file, 'r', encoding='utf-8') as f:
+            comp_data = json.load(f)
+        
+        # Extract GeneCards
+        genecards = comp_data.get('sources', {}).get('genecards', {})
+        if genecards.get('status') == 'success':
+            for item in genecards.get('data', []):
+                summary = item.get('summary', '')
+                if summary:
+                    all_texts.append(("GeneCards", f"Gene: {gene_name}\n{summary}"))
+            print(f"   ✅ Added GeneCards data")
+        
+        # Extract arXiv
+        arxiv = comp_data.get('sources', {}).get('arxiv', {})
+        if arxiv.get('status') == 'success':
+            for paper in arxiv.get('data', []):
+                title = paper.get('title', '')
+                summary = paper.get('summary', '')
+                if summary:
+                    text = f"Title: {title}\n\nAbstract: {summary}"
+                    all_texts.append(("arXiv", text))
+            print(f"   ✅ Added {len(arxiv.get('data', []))} arXiv papers")
+    else:
+        print(f"   ⚠️ Comprehensive literature file not found")
+    
+    if not all_texts:
+        print(f"   ❌ No literature sources found for {gene_name}")
+        return None
+    
+    # Create documents with metadata
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
+    all_docs = []
+    
+    for source, text in all_texts:
+        docs = text_splitter.create_documents(
+            [text],
+            metadatas=[{"source": source, "gene": gene_name}]
+        )
+        all_docs.extend(docs)
+    
+    print(f"📄 Split literature into {len(all_docs)} documents from {len(all_texts)} sources")
 
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-    vector_store = FAISS.from_documents(docs, embeddings)
+    vector_store = FAISS.from_documents(all_docs, embeddings)
     vector_store.save_local(str(vector_store_path))
     print(f"✅ Saved FAISS index for {gene_name} to {vector_store_path}")
     
     return vector_store
 
-def analyze_gene_with_rag(gene_name, vector_store):
-    """Analyze gene using DeepSeek API with RAG context"""
+def get_tavily_context(gene_name):
+    """
+    Get Tavily results directly (already RAG-processed by Tavily)
+    Returns formatted string of Tavily AI answer and search results
+    """
+    results_dir = Path("../results")
+    comp_file = results_dir / f"{gene_name.lower()}_comprehensive_literature.json"
     
-    # Get API key
-    api_key_file = Path(__file__).parent.parent / "api_key"
-    with open(api_key_file, 'r') as f:
-        api_key = f.read().strip()
+    if not comp_file.exists():
+        return ""
+    
+    try:
+        with open(comp_file, 'r', encoding='utf-8') as f:
+            comp_data = json.load(f)
+        
+        tavily = comp_data.get('sources', {}).get('tavily', {})
+        if tavily.get('status') != 'success':
+            return ""
+        
+        tavily_data = tavily.get('data', [])
+        if not tavily_data:
+            return ""
+        
+        # Format Tavily results
+        context_parts = []
+        
+        # Add AI answer if available
+        for item in tavily_data:
+            if item.get('type') == 'answer':
+                context_parts.append(f"🌐 Tavily AI Summary:\n{item.get('content', '')}\n")
+                break
+        
+        # Add top search results
+        search_results = [item for item in tavily_data if item.get('type') == 'search_result']
+        if search_results:
+            context_parts.append("\n🔍 Tavily Web Sources:")
+            for i, item in enumerate(search_results[:3], 1):  # Top 3 results
+                title = item.get('title', 'No title')
+                content = item.get('content', '')[:200]  # First 200 chars
+                context_parts.append(f"{i}. {title}\n   {content}...")
+        
+        return "\n".join(context_parts)
+        
+    except Exception as e:
+        print(f"⚠️ Error loading Tavily context: {e}")
+        return ""
+
+
+def analyze_gene_with_rag(gene_name, vector_store):
+    """Analyze gene using DeepSeek API with RAG context from multiple sources"""
+    
+    # Get API key from environment variable
+    from config import get_deepseek_api_key
+    api_key = get_deepseek_api_key()
     
     # Load existing gene data if available
     results_dir = Path(__file__).parent.parent / "results"
@@ -91,21 +187,32 @@ def analyze_gene_with_rag(gene_name, vector_store):
     # Define the core question for retrieval
     retrieval_query = f"Summarize the function, disease mechanisms, and clinical phenotypes of the {gene_name} gene."
     
-    # Retrieve relevant context from the vector store
+    # Retrieve relevant context from the vector store (PubMed + GeneCards + arXiv)
     if vector_store:
         retriever = vector_store.as_retriever(search_kwargs={"k": 5})
         retrieved_docs = retriever.get_relevant_documents(retrieval_query)
-        pubmed_context = "\n\n---\n\n".join([doc.page_content for doc in retrieved_docs])
+        rag_context = "\n\n---\n\n".join([
+            f"[Source: {doc.metadata.get('source', 'Unknown')}]\n{doc.page_content}" 
+            for doc in retrieved_docs
+        ])
         print(f"Retrieved {len(retrieved_docs)} relevant documents from FAISS.")
     else:
-        pubmed_context = ""
+        rag_context = ""
+    
+    # Get Tavily context (already RAG-processed, use directly)
+    tavily_context = get_tavily_context(gene_name)
+    if tavily_context:
+        print(f"✅ Added Tavily web search context")
 
     # Create RAG-enhanced query
     context_section = f"""
-**IMPORTANT: Base your analysis STRICTLY on the provided PubMed literature context below. Do NOT hallucinate or make up information not supported by the literature.**
+**IMPORTANT: Base your analysis STRICTLY on the provided literature context below. Do NOT hallucinate or make up information not supported by the literature.**
 
-**Retrieved PubMed Literature Context:**
-{pubmed_context if pubmed_context else "No literature context available - please note this limitation in your analysis."}
+**Retrieved Literature Context (PubMed + GeneCards + arXiv):**
+{rag_context if rag_context else "No RAG context available."}
+
+**Tavily Web Search (Real-time, fact-checked):**
+{tavily_context if tavily_context else "No Tavily context available."}
 
 """
     

@@ -50,10 +50,9 @@ def reflection_agent(
     
     print(f"\n🧠 Reflection Agent reviewing {gene_name} analysis...")
     
-    # Get API key
-    api_key_file = Path(__file__).parent.parent / "api_key"
-    with open(api_key_file, 'r') as f:
-        api_key = f.read().strip()
+    # Get API key from environment variable
+    from config import get_deepseek_api_key
+    api_key = get_deepseek_api_key()
     
     # Build reflection prompt
     prompt = f"""
@@ -246,9 +245,8 @@ def _refine_analysis(
     Refine analysis based on reflection feedback
     """
     
-    api_key_file = Path(__file__).parent.parent / "api_key"
-    with open(api_key_file, 'r') as f:
-        api_key = f.read().strip()
+    from config import get_deepseek_api_key
+    api_key = get_deepseek_api_key()
     
     suggestions = reflection.get("improvement_suggestions", [])
     missing_info = reflection.get("missing_information", [])

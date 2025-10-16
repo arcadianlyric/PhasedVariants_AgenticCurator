@@ -42,10 +42,9 @@ def planner_agent(gene_name: str, analysis_goal: str = "comprehensive") -> List[
         List of steps with agent assignments
     """
     
-    # Get API key
-    api_key_file = Path(__file__).parent.parent / "api_key"
-    with open(api_key_file, 'r') as f:
-        api_key = f.read().strip()
+    # Get API key from environment variable
+    from config import get_deepseek_api_key
+    api_key = get_deepseek_api_key()
     
     prompt = f"""
 You are a planning agent for genetic analysis. Create a detailed step-by-step plan for analyzing the {gene_name} gene.

@@ -26,10 +26,9 @@ def read_gene_list(gene_file="../gene_list.txt"):
 def analyze_gene_with_deepseek(gene_name):
     """Analyze gene using DeepSeek API directly"""
     
-    # Get API key
-    api_key_file = Path(__file__).parent.parent / "api_key"
-    with open(api_key_file, 'r') as f:
-        api_key = f.read().strip()
+    # Get API key from environment variable
+    from config import get_deepseek_api_key
+    api_key = get_deepseek_api_key()
     
     # Load existing gene data if available
     results_dir = Path(__file__).parent.parent / "results"

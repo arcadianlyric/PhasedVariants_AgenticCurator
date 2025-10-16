@@ -18,3 +18,5 @@ dependencies:
     - faiss-cpu
     - sentence-transformers
     - beautifulsoup4
+    - tavily-python
+    - python-dotenv

@@ -170,6 +170,63 @@
         }
       ],
       "query_used": "P2RX5 cancer rs2142993306"
+    },
+    "tavily": {
+      "status": "success",
+      "data": [
+        {
+          "source": "Tavily",
+          "type": "answer",
+          "content": "P2RX5 is linked to cancer, particularly in colon and kidney cancers, where its expression correlates with prognosis. The rs2142993306 variant is associated with altered P2RX5 function. P2RX5 is a purinergic receptor involved in cellular signaling.",
+          "query": "P2RX5 cancer rs2142993306"
+        },
+        {
+          "source": "Tavily",
+          "type": "search_result",
+          "title": "P2RX5",
+          "url": "https://en.wikipedia.org/wiki/P2RX5",
+          "content": "| | Orthologs |  | Species | Human | Mouse | | Entrez | |  |  | 5026 | | |  |  | 94045 | | | Ensembl | |  |  | ENSG00000083454 | | |  |  | ENSMUSG00000005950 | | | UniProt | |  |  | Q93086 | | |  |  | n/a | | | RefSeq (mRNA) | |  |  | NM\\_175081NM\\_001204519NM\\_001204520NM\\_002561NM\\_175080 | | |  |  | NM\\_033321NM\\_001376982NM\\_001376983 | | | RefSeq (protein) | |  |  | NP\\_001191448NP\\_001191449NP\\_002552NP\\_778255 | | |  |  | n/a | | | Location (UCSC) | Chr 17: 3.67 – 3.7 Mb | Chr 11: 73.05 [...] Ota T, Suzuki Y, Nishikawa T, et al. (2004). \"Complete sequencing and characterization of 21,243 full-length human cDNAs\". Nat. Genet. 36 (1): 40–5. doi \"Doi (identifier)\"):10.1038/ng1285. PMID \"PMID (identifier)\") 14702039. [...] Istradefylline  KF-26777  Lu AA41063  Lu AA47070  MRE3008F20  MRS-1191  MRS-1220\")  MRS-1334\")  MRS-1523  MRS-1706  MRS-1754\")  MRS-3777\")  MSX-2  MSX-3  MSX-4  Muvadenant\")  Paraxanthine  Pentoxifylline  Preladenant  Propentofylline  Proxyphylline  PSB-10  PSB-11\")  PSB-36\")  PSB-603\")  PSB-788\")  PSB-1115\")  PSB-1901\")  Reversine  Rolofylline  SCH-442,416  SCH-58261  Sipagladenant  Taminadenant  Theacrine  Theobromine  Theodrenaline  Theophylline  Tozadenant\")  Tracazolate  Vipadenant\")",
+          "score": 0.6445166,
+          "query": "P2RX5 cancer rs2142993306"
+        },
+        {
+          "source": "Tavily",
+          "type": "search_result",
+          "title": "P2RX5 Gene",
+          "url": "https://maayanlab.cloud/Harmonizome/gene/P2RX5",
+          "content": "nonmelanoma skin cancers, activation of the P2RX5 receptor is associated with reduced keratinocyte proliferation and the initiation of early differentiation, suggesting a role in maintaining epidermal homeostasis and, in pathological states, contributing to epidermal thinning as seen in chronic venous insufficiency. A similar correlation is observed in the urinary bladder, where altered P2RX5 expression parallels changes in urothelial differentiation and tumor grade. Structure–function analyses [...] | Description | The product of this gene belongs to the family of purinoceptors for ATP. This receptor functions as a ligand-gated ion channel. Alternative splicing results in multiple transcript variants. Read-through transcription also exists between this gene and the neighboring downstream gene, TAX1BP3 (Tax1 binding protein 3). [provided by RefSeq, Mar 2011] | [...] |  | MSigDB Signatures of Differentially Expressed Genes for Cancer Gene Perturbations | gene perturbations changing expression of P2RX5 gene from the MSigDB Signatures of Differentially Expressed Genes for Cancer Gene Perturbations dataset. |\n|\n|  | NIBR DRUG-seq U2OS MoA Box Gene Expression Profiles | drug perturbations changing expression of P2RX5 gene from the NIBR DRUG-seq U2OS MoA Box dataset. |\n|",
+          "score": 0.41151342,
+          "query": "P2RX5 cancer rs2142993306"
+        },
+        {
+          "source": "Tavily",
+          "type": "search_result",
+          "title": "Integrated analysis of gene expression signatures ...",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/29408621/",
+          "content": "Conclusion:\nSLC44A1 and KLF13 may be involved in tumorigenesis and the metastasis of colon cancer by miRNA regulation. In addition, a four-gene (VAMP1, P2RX5, CACNB1, and CRY2) expression signature may have prognostic and predictive value in colon cancer.\n\nKeywords:\nColon cancer; Differentially expressed genes; Meta-analysis; Prognostic risk model; Regulatory factor.\n\nCopyright © 2018. Published by Elsevier B.V.\n\nPubMed Disclaimer\n\n## MeSH terms\n\n## Substances\n\n## LinkOut - more resources [...] hsa-miR-182, hsa-miR-206, and hsa-miR-153. Moreover, the results of the prognostic risk model showed that four genes (VAMP1, P2RX5, CACNB1, and CRY2) could divide the samples into high and low risk groups. [...] ### Full Text Sources\n\n### Other Literature Sources\n\nElsevier Science full text link\n\nNCBI Literature Resources\n\nMeSH\nPMC\nBookshelf\nDisclaimer\n\nThe PubMed wordmark and PubMed logo are registered trademarks of the U.S. Department of Health and Human Services (HHS). Unauthorized use of these marks is strictly prohibited.\n\nConnect with NLM\n\nNational Library of Medicine  \n8600 Rockville Pike  \nBethesda, MD 20894\n\nWeb Policies  \nFOIA  \nHHS Vulnerability Disclosure\n\nHelp  \nAccessibility  \nCareers",
+          "score": 0.30681825,
+          "query": "P2RX5 cancer rs2142993306"
+        },
+        {
+          "source": "Tavily",
+          "type": "search_result",
+          "title": "The potential value of the Purinergic pathway in ...",
+          "url": "https://www.aging-us.com/article/205364/text",
+          "content": "Figure 1E further delves into the survival of Purinergic genes in KIRC samples, and the results of the analysis show that among the 19 Purinergic genes covered, the high expression of 12 Purinergic genes showed a negative correlation with the prognosis of KIRC patients. Particularly noteworthy were four Purinergic genes, P2RX5, GNAS, P2RX6, and P2RY11, which showed a significant association between their high expression in KIRC patients and poor patient prognosis (P < 0.001). In contrast, the [...] ADORA1 showed gain in 33 different types of cancers. PANX1, P2RY2, P2RY4, P2RY6, P2RX1, P2RX5, P2RX6, LPAR6, GNAZ, ADORA2A, ADORA2B showed a gain in 33 different types of cancer showed CNV deletion. Purinergic genes were present in 33 tumors with varying degrees of SNV, with Purinergic genes having the highest rate of SNV mutations in UCEC. mRNA expression profiles of Purinergic genes demonstrated the expression levels of these genes in 20 tumors. Among them, the greatest differences in mRNA [...] (Figure 5B). To further explore the effect of Purinergic genes on analysis (Figure 5C). The analysis showed that 12 out of 27 Purinergic genes were able to affect the prognosis of KIRC patients significantly. Among them, PANX1, P2RY6, P2RY2, ADORA1, P2RX6, P2RY11, P2RX5, ADORA2B, P2RX1, GNAS were risk factors (hazard ratio >1) and P2RY8, GNAI1 were protective factors (hazard ratio <1). We selected nine Purinergic genes with statistically significant (p < 0.05) effects on KIRC for co-expression",
+          "score": 0.3012392,
+          "query": "P2RX5 cancer rs2142993306"
+        },
+        {
+          "source": "Tavily",
+          "type": "search_result",
+          "title": "Diseases associated with P2RX5",
+          "url": "https://platform.opentargets.org/target/ENSG00000083454/associations",
+          "content": "Ranked list of diseases and phenotypes associated with P2RX5.",
+          "score": 0.22395399,
+          "query": "P2RX5 cancer rs2142993306"
+        }
+      ],
+      "query_used": "P2RX5 cancer rs2142993306"
     }
   }
 }

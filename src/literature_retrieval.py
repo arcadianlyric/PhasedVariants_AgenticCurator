@@ -1,11 +1,12 @@
 """
 Enhanced Literature Retrieval Agent
-Searches PubMed, GeneCards, and arXiv for gene-related information
+Searches PubMed, GeneCards, arXiv, and Tavily for gene-related information
 Inspired by Coursera agentic-ai-public/src/research_tools.py
 """
 
 import json
 import time
+import os
 import requests
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -22,6 +23,13 @@ try:
 except ImportError:
     PDF_EXTRACTION_AVAILABLE = False
     print("⚠️ pdfminer.six not installed. Run: pip install pdfminer.six")
+
+try:
+    from tavily import TavilyClient
+    TAVILY_AVAILABLE = True
+except ImportError:
+    TAVILY_AVAILABLE = False
+    print("⚠️ tavily-python not installed. Run: pip install tavily-python")
 
 
 def _build_session(user_agent: str = "GeneAnalysis/1.0") -> requests.Session:
@@ -50,6 +58,77 @@ def _build_session(user_agent: str = "GeneAnalysis/1.0") -> requests.Session:
 
 
 session = _build_session()
+
+
+def tavily_search(query: str, max_results: int = 5) -> List[Dict]:
+    """
+    Search using Tavily API for web-based gene information
+    Tavily provides real-time, factual web search results
+    
+    Args:
+        query: Search query
+        max_results: Maximum number of results
+    
+    Returns:
+        List of dictionaries with search results
+    """
+    if not TAVILY_AVAILABLE:
+        return [{"error": "tavily-python package not installed"}]
+    
+    # Load environment variables
+    try:
+        from dotenv import load_dotenv
+        env_path = Path(__file__).parent.parent / ".env"
+        if env_path.exists():
+            load_dotenv(env_path)
+    except:
+        pass
+    
+    api_key = os.getenv("TAVILY_API_KEY")
+    if not api_key:
+        return [{"error": "TAVILY_API_KEY not found in environment variables"}]
+    
+    try:
+        client = TavilyClient(api_key)
+        
+        response = client.search(
+            query=query,
+            max_results=max_results,
+            search_depth="advanced",  # More comprehensive search
+            include_answer=True,      # Get AI-generated answer
+            include_raw_content=False
+        )
+        
+        results = []
+        
+        # Add AI-generated answer if available
+        if response.get("answer"):
+            results.append({
+                "source": "Tavily",
+                "type": "answer",
+                "content": response["answer"],
+                "query": query
+            })
+        
+        # Add search results
+        search_results = response.get("results", [])
+        if search_results:
+            for item in search_results:
+                results.append({
+                    "source": "Tavily",
+                    "type": "search_result",
+                    "title": item.get("title", ""),
+                    "url": item.get("url", ""),
+                    "content": item.get("content", ""),
+                    "score": item.get("score", 0),
+                    "query": query
+                })
+        
+        # Return results or empty list (not error)
+        return results
+        
+    except Exception as e:
+        return [{"error": f"Tavily search failed: {str(e)}"}]
 
 
 def genecards_search(gene_name: str, fallback_queries: List[str] = None) -> List[Dict]:
@@ -412,6 +491,32 @@ def comprehensive_literature_search(
     except Exception as e:
         results["sources"]["arxiv"] = {"status": "error", "message": str(e)}
         print(f"   ❌ arXiv: {e}")
+    
+    time.sleep(1)  # Rate limiting
+    
+    # 4. Tavily Search (web search for real-time information)
+    print(f"\n🌐 Searching Tavily (Web Search)...")
+    try:
+        # Use the most specific query for Tavily
+        tavily_query = search_queries[0]
+        tavily_results = tavily_search(tavily_query, max_results=5)
+        
+        if tavily_results and len(tavily_results) > 0 and "error" not in tavily_results[0]:
+            results["sources"]["tavily"] = {
+                "status": "success",
+                "data": tavily_results,
+                "query_used": tavily_query
+            }
+            print(f"   ✅ Tavily: Found {len(tavily_results)} results")
+            # Show if we got an AI answer
+            if tavily_results and tavily_results[0].get('type') == 'answer':
+                print(f"      AI Answer: {tavily_results[0]['content'][:80]}...")
+        else:
+            results["sources"]["tavily"] = {"status": "no_results"}
+            print(f"   ⚠️ Tavily: No results")
+    except Exception as e:
+        results["sources"]["tavily"] = {"status": "error", "message": str(e)}
+        print(f"   ❌ Tavily: {e}")
     
     # Save comprehensive results
     if output_dir is None:

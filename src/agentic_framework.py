@@ -176,21 +176,35 @@ class AgenticOrchestrator:
                 return f"⚠️ Literature retrieval error: {e}"
     
     def _rag_analysis_agent(self, task: str) -> str:
-        """Execute RAG analysis with FAISS"""
-        from llm_rag import get_or_create_vector_store
+        """Execute RAG analysis with FAISS (PubMed + GeneCards + arXiv) + Tavily"""
+        from llm_rag import get_or_create_vector_store, get_tavily_context
         
         vector_store = get_or_create_vector_store(self.gene_name)
         
+        results = []
+        
         if vector_store:
-            # Perform retrieval
+            # Perform retrieval from FAISS (PubMed + GeneCards + arXiv)
             retriever = vector_store.as_retriever(search_kwargs={"k": 5})
             query = f"Summarize function, mechanisms, and phenotypes of {self.gene_name}"
             docs = retriever.get_relevant_documents(query)
             
-            retrieved_text = "\n\n".join([doc.page_content for doc in docs])
-            return f"✅ Retrieved {len(docs)} relevant documents from FAISS\n\n{retrieved_text[:500]}..."
+            retrieved_text = "\n\n".join([
+                f"[{doc.metadata.get('source', 'Unknown')}] {doc.page_content[:300]}..." 
+                for doc in docs
+            ])
+            results.append(f"✅ Retrieved {len(docs)} documents from FAISS (PubMed+GeneCards+arXiv)")
+            results.append(retrieved_text[:800])
         else:
-            return "⚠️ Could not create vector store"
+            results.append("⚠️ Could not create vector store")
+        
+        # Add Tavily context (already RAG-processed)
+        tavily_context = get_tavily_context(self.gene_name)
+        if tavily_context:
+            results.append("\n✅ Tavily Web Search Context:")
+            results.append(tavily_context[:500])
+        
+        return "\n\n".join(results)
     
     def _knowledge_graph_agent(self, task: str) -> str:
         """Execute knowledge graph query"""

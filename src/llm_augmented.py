@@ -43,10 +43,9 @@ def load_pubmed_context_for_gene(gene_name):
 def analyze_gene_with_rag(gene_name, pubmed_context=""):
     """Analyze gene using DeepSeek API with RAG context"""
     
-    # Get API key
-    api_key_file = Path(__file__).parent.parent / "api_key"
-    with open(api_key_file, 'r') as f:
-        api_key = f.read().strip()
+    # Get API key from environment variable
+    from config import get_deepseek_api_key
+    api_key = get_deepseek_api_key()
     
     # Load existing gene data if available
     results_dir = Path(__file__).parent.parent / "results"
