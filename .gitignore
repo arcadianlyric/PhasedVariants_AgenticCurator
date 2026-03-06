@@ -1,12 +1,23 @@
 data
 db
 test
-rag
 kg
 tmp
 results/nohup.out
 results/phased_vep_results.txt
-parse_vep_csq.py
 __pycache__
-*pdf
+*.pdf
 .DS_Store
+results/deprecated
+
+# Environment variables and API keys
+.env
+api_key
+*.key
+
+# Debug artifacts
+pipeline_debug.json
+
+# IDE
+.vscode/
+.idea/

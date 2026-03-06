@@ -1,12 +1,17 @@
 """
-Agentic Gene Analysis with Planning, Reflection, and Multi-Agent Collaboration
-Main entry point for the enhanced agentic workflow
+Agentic Gene Analysis - Main Entry Point
+
+Default: Multi-Agent v2 workflow (Output Agent + Review Agent)
+Legacy:  v1 workflow (Planning + Execution + Reflection)
+
+Usage:
+    python llm_agentic.py              # v2 multi-agent (recommended)
+    python llm_agentic.py --legacy      # v1 legacy workflow
 """
 
 import sys
 import time
 from pathlib import Path
-from agentic_framework import run_agentic_analysis
 
 
 def read_gene_list(gene_file="../gene_list.json"):
@@ -46,93 +51,56 @@ def read_gene_list(gene_file="../gene_list.json"):
         return []
 
 
-def main():
-    """Main function for agentic gene analysis"""
-    
-    print("\n" + "="*70)
-    print("🧬 AGENTIC GENE ANALYSIS FRAMEWORK")
-    print("="*70)
-    print("\n✨ Features:")
-    print("   • Planning: Automatic task decomposition")
-    print("   • Multi-Agent: Specialized agents for each task")
-    print("   • Reflection: Quality assessment and iterative refinement")
-    print("   • RAG: FAISS-powered semantic retrieval")
-    print("="*70)
-    
-    # Read gene list
+def main_v2():
+    """Multi-Agent v2 workflow (recommended)"""
+    from multi_agent_workflow import main as ma_main
+    ma_main()
+
+
+def main_v1():
+    """Legacy v1 workflow with planning + execution + reflection"""
+    from agentic_framework import run_agentic_analysis
+
     genes_info = read_gene_list()
     if not genes_info:
-        print("\n❌ No genes to analyze")
+        print("No genes to analyze")
         return
-    
+
     gene_names = [g['gene_name'] for g in genes_info]
-    print(f"\n📋 Found {len(genes_info)} genes to analyze: {', '.join(gene_names)}")
-    
-    # Show additional metadata if available
-    for gene_info in genes_info:
-        if 'disease' in gene_info or 'variant_id' in gene_info:
-            print(f"   • {gene_info['gene_name']}: ", end="")
-            if 'disease' in gene_info:
-                print(f"disease={gene_info['disease']} ", end="")
-            if 'variant_id' in gene_info:
-                print(f"variant={gene_info['variant_id']}", end="")
-            print()
-    
-    # Analyze each gene with agentic framework
+    print(f"Found {len(genes_info)} genes: {', '.join(gene_names)}")
+
     all_results = []
-    
     for i, gene_info in enumerate(genes_info, 1):
         gene = gene_info['gene_name']
-        print(f"\n\n{'#'*70}")
+        print(f"\n{'#'*70}")
         print(f"# GENE {i}/{len(genes_info)}: {gene}")
         print(f"{'#'*70}\n")
-        
+
         try:
-            # Run agentic analysis
             results = run_agentic_analysis(gene, analysis_goal="comprehensive")
             all_results.append(results)
-            
-            # Display summary
-            print(f"\n{'='*70}")
-            print(f"📊 SUMMARY for {gene}:")
-            print(f"{'='*70}")
-            print(f"   ✅ Total Steps: {results['metadata']['total_steps']}")
-            print(f"   🔄 Reflection Iterations: {results['metadata']['reflection_iterations']}")
-            print(f"   ⭐ Final Quality Score: {results['metadata']['final_quality_score']:.1f}/10")
-            print(f"   ⏱️  Time: {results['elapsed_time_seconds']:.1f}s")
-            print(f"{'='*70}")
-            
+            print(f"  Score: {results['metadata']['final_quality_score']:.1f}/10")
+            print(f"  Time: {results['elapsed_time_seconds']:.1f}s")
         except Exception as e:
-            print(f"\n❌ Error analyzing {gene}: {e}")
+            print(f"Error analyzing {gene}: {e}")
             import traceback
             traceback.print_exc()
-            continue
-        
-        # Delay between genes
+
         if i < len(genes_info):
-            print(f"\n⏳ Waiting 3 seconds before next gene...")
             time.sleep(3)
-    
-    # Final summary
-    print(f"\n\n{'='*70}")
-    print("🎉 ALL ANALYSES COMPLETE")
-    print(f"{'='*70}")
-    print(f"   Total Genes Analyzed: {len(all_results)}/{len(genes_info)}")
-    
+
     if all_results:
-        avg_quality = sum(r['metadata']['final_quality_score'] for r in all_results) / len(all_results)
-        total_time = sum(r['elapsed_time_seconds'] for r in all_results)
-        
-        print(f"   Average Quality Score: {avg_quality:.1f}/10")
-        print(f"   Total Time: {total_time:.1f}s")
-        
-        print(f"\n📁 Results saved to:")
-        for result in all_results:
-            gene = result['gene']
-            print(f"   • {gene.lower()}_agentic_analysis.json")
-            print(f"   • {gene.lower()}_agentic_report.md")
-    
-    print(f"{'='*70}\n")
+        avg = sum(r['metadata']['final_quality_score'] for r in all_results) / len(all_results)
+        print(f"\nAverage Quality: {avg:.1f}/10")
+
+
+def main():
+    """Entry point: route to v2 (default) or v1 (--legacy)"""
+    if "--legacy" in sys.argv:
+        print("Running legacy v1 workflow...")
+        main_v1()
+    else:
+        main_v2()
 
 
 if __name__ == "__main__":

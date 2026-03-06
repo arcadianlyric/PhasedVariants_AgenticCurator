@@ -1,244 +1,228 @@
-## Connecting genotype to phenotype with phasing information    
+## PhasedVariants AgenticCurator
 
-### Background  
-Genomic phasing, the process of determining which genetic variants reside on the same chromosome (haplotype), is critical for unraveling complex genetic scenarios, such as compound heterozygosity or the effects of cis-regulatory variants. The foundation of this process lies in generating highly accurate and comprehensive phased data. At Complete Genomics, we have developed a robust pipeline [cWGS](https://github.com/Complete-Genomics/DNBSEQ_Complete_WGS/tree/dev), which produces high-fidelity phased VCF files with DeepVariant and HapCUT2.  
-However, interpreting the results – detailed gene functions and variant impacts within the phased VCF – often requires significant manual interpretation by skilled variant curators to extract biological and clinical meaning. This process is time-consuming, limits throughput, and can vary between curators.  
-To automate this interpretation, building on the foundation of high-quality phased data, we have designed an agentic workflow, enhanced with a RAG-Enhanced LLM Agent.  
+Automated gene/variant curation from phased whole-genome sequencing data, powered by a multi-agent LLM system with RAG.
 
-### Keywords
-Agentic AI, Multi-Agent Systems, Planning & Reflection, LLM, RAG/Langchain, FAISS, Haplotype Phasing, Gene/Variant Curation, Knowledge Graph, Multi-Source Literature Retrieval (PubMed + GeneCards + arXiv + Tavily), Progressive Search Strategy, Hallucination Reduction      
+### Background
+
+Genomic phasing determines which genetic variants co-occur on the same chromosome (haplotype). This is critical for resolving compound heterozygosity and cis-regulatory effects. At Complete Genomics, the [cWGS pipeline](https://github.com/Complete-Genomics/DNBSEQ_Complete_WGS/tree/dev) produces high-fidelity phased VCF files using DeepVariant and HapCUT2.
+
+Interpreting phased variants -- linking genotypes to gene function, disease mechanisms, and clinical significance -- traditionally requires manual curation by domain experts. This is slow, hard to scale, and inconsistent across curators.
+
+This project automates that interpretation using a multi-agent LLM workflow with retrieval-augmented generation (RAG), knowledge graph integration, and iterative quality control.
+
+**Keywords:** Multi-Agent Systems, RAG, FAISS, LLM, Haplotype Phasing, Gene/Variant Curation, Knowledge Graph, PubMed, GeneCards, arXiv, Tavily, Hallucination Reduction
+
+---
+
+### Architecture
+![flowchart](images/flowchart.jpg)  
+
+The system operates in three steps:
+
+1. **Variant Discovery** -- Parse phased VCF, identify variants with VEP HIGH impact on both haplotypes, and build gene networks via PrimeKG.
+2. **Literature Retrieval** -- Multi-source progressive search (gene+disease+variant -> gene+disease -> gene only) across PubMed, GeneCards, arXiv, and Tavily.
+3. **Multi-Agent Curation** -- An Output Agent generates literature-grounded analysis; a Review Agent independently evaluates quality (5 dimensions, 0-10 scale) and flags hallucinations. The loop iterates until the quality threshold is met.
+
+---
 
 ### Results
-1. Explore phased VCF, get variants with VEP HIGH impact on both copies, get gene networks connected by diseases, phenotypes and pathways by querying knowledge graph.  
 
-```
-vcf_file=data/HG002_exon.vep.vcf.gz
-kg_path=db/kg.csv
-ref_fai=db/GCA_000001405.15_GRCh38_no_alt_analysis_set.ercc.fa.fai
-output_path=phased_results
+#### Step 1: Variant Discovery and Gene Network
+
+```bash
+cd src
+vcf_file=../data/HG002_exon.vep.vcf.gz
+kg_path=../db/kg.csv
+ref_fai=../db/GCA_000001405.15_GRCh38_no_alt_analysis_set.ercc.fa.fai
 python explore_phased_vcf.py --vcf_file $vcf_file --kg_path $kg_path --ref_fai $ref_fai
 ```
-Output variants with VEP HIGH impact on both copies. Such vairants are used to mine Knowledge Graph to get gene networks connected by diseases, phenotypes and pathways. There are 2 files in the ./results folder: network_graph.html and gene_associations.json. The [results/network_graph.html](results/network_graph.html) is a interactive visulization. 
-User select genes of interest from the gene network, create gene_list.json for next step.   
-![network_graph](images/network_graph.jpg) 
 
-2. Multi-source literature retrieval and agentic gene/variant curation.    
+- **Input:** Phased VCF with VEP annotations (FORMAT: `Uploaded_variation|Location|Allele|Gene|Feature|...`)
+- **Output:** `results/network_graph.html` (interactive gene-disease-pathway network), `results/gene_associations.json`
+- User selects genes of interest from the network, writes `gene_list.json` for downstream curation.
 
-**Setup:**
-- Create `gene_list.json` with genes of interest (selected from the gene network)
-- Set environment variables in `.env` file:
-  ```bash
-  DEEPSEEK_API_KEY=your-deepseek-key
-  TAVILY_API_KEY=your-tavily-key
-  PUBMED_EMAIL=your.email@example.com
-  ```
-- Or export them directly:
-  ```bash
-  export DEEPSEEK_API_KEY='your-key'
-  export TAVILY_API_KEY='your-key'
-  ```
+![network_graph](images/network_graph.jpg)
 
-**Gene List Format (JSON):**
-```json
-{"gene_name": "P2RX5", "disease": "cancer", "variant_id": "rs2142993306"}
-{"gene_name": "BRCA1", "disease": "breast cancer", "variant_id": "rs80357906"}
-```
+#### Step 2: Literature Retrieval
 
-**Literature Retrieval (Multi-Source):**
 ```bash
-# 🌟 NEW: Comprehensive literature search from 4 sources
-# - PubMed: Biomedical abstracts
-# - GeneCards: Comprehensive gene database (function, aliases, pathways)
-# - arXiv: Computational biology papers
-# - Tavily: Real-time web search with AI-generated answers (reduces hallucinations)
-# Uses progressive search strategy: gene+disease+variant → gene+disease → gene only
+cd src
 python literature_retrieval.py
 ```
 
-**LLM Analysis Approaches:**
+- **Input:** `gene_list.json`
+- **Output:** `results/{gene}_comprehensive_literature.json`, `results/{gene}_pubmed_response.txt`
+- Sources: PubMed (biomedical abstracts), GeneCards (gene function/aliases/pathways), arXiv (computational biology preprints), Tavily (real-time web search with AI-synthesized answers).
+- Progressive search strategy with query tracking (`query_used` field) for transparency.
+
+#### Step 3: Multi-Agent Curation (Recommended)
+
 ```bash
-# Basic approaches:
-python llm_queryAlone.py      # LLM alone (no context)
-python llm_augmented.py        # Literature augmentation
-python llm_rag.py              # FAISS-powered RAG
-
-# 🌟 Agentic Framework (Recommended):
-# - Planning: Automatic task decomposition
-# - Multi-Agent: 7 specialized agents collaborate
-# - Reflection: Quality assessment (0-10 score)
-# - Refinement: Iterative improvement (up to 2 iterations)
-python llm_agentic.py
+cd src
+python llm_agentic.py            # v2 multi-agent (default, recommended)
+python llm_agentic.py --legacy   # v1 planning+execution+reflection
 ```
 
-**Example Outputs:**
-- Multi-source literature: [results/{gene}_comprehensive_literature.json](results/p2rx5_comprehensive_literature.json)
-- Basic RAG: [results/p2rx5_rag_analysis.json](results/p2rx5_rag_analysis.json)
-- Agentic analysis: [results/p2rx5_agentic_analysis.json](results/p2rx5_agentic_analysis.json)
-- Agentic report: [results/p2rx5_agentic_report.md](results/p2rx5_agentic_report.md)  
+- **Input:** `gene_list.json`, literature files from Step 2, knowledge graph
+- **Output:** `results/{gene}_multiagent_analysis.json`, `results/{gene}_multiagent_report.md`
 
-### Agentic Architecture
+Alternative single-agent approaches for comparison:
 
-The system implements a **true agentic framework** with planning, reflection, and multi-agent collaboration:
-
-#### 🎯 Core Agentic Capabilities
-
-**1. Planning Agent**
-- **Automatic Task Decomposition**: Breaks down complex gene analysis into 5-7 atomic, actionable steps
-- **Agent Assignment**: Routes each step to the most appropriate specialized agent
-- **Dynamic Planning**: Adapts plan based on analysis goals (comprehensive, disease-focused, variant-focused)
-- **Dependency Management**: Ensures steps build upon previous results
-
-**2. Multi-Agent Collaboration**
-Specialized agents work together in a coordinated workflow:
-- **Literature Retrieval Agent**: Multi-source search (PubMed + GeneCards + arXiv + Tavily) with progressive strategy
-- **Vector Store Agent**: Creates and manages FAISS indices for semantic search
-- **RAG Analysis Agent**: Performs retrieval-augmented generation with context
-- **Knowledge Graph Agent**: Queries gene-disease-pathway relationships from PrimeKG
-- **Variant Curator Agent**: Analyzes genetic variants and their impacts
-- **Reflection Agent**: Evaluates analysis quality and identifies gaps
-- **Report Generator Agent**: Creates comprehensive clinical reports
-
-**3. Reflection & Quality Control**
-- **Automated Quality Assessment**: Scores analysis on 5 dimensions (completeness, accuracy, evidence support, clarity, clinical utility)
-- **Gap Identification**: Detects missing information and unsupported claims
-- **Hallucination Detection**: Flags statements not grounded in literature
-- **Iterative Refinement**: Automatically improves analysis based on reflection feedback (up to 2 iterations)
-
-**4. Agentic Workflow Pipeline**
-```
-┌─────────────┐
-│  Planning   │  ← Decompose task into steps
-└──────┬──────┘
-       ↓
-┌─────────────┐
-│  Execution  │  ← Multi-agent collaboration
-│             │    (Literature → RAG → KG → Analysis)
-└──────┬──────┘
-       ↓
-┌─────────────┐
-│ Reflection  │  ← Quality assessment
-└──────┬──────┘
-       ↓
-┌─────────────┐
-│ Refinement  │  ← Iterative improvement
-└──────┬──────┘
-       ↓
-┌─────────────┐
-│   Report    │  ← Final comprehensive report
-└─────────────┘
+```bash
+python llm_queryAlone.py     # LLM alone (no context, baseline)
+python llm_augmented.py      # LLM + PubMed text (simple augmentation)
+python llm_rag.py            # LLM + FAISS RAG (single-agent)
 ```
 
-**5. Multi-Source Literature Retrieval**
-- **PubMed**: Peer-reviewed biomedical abstracts (clinical evidence)
-- **GeneCards**: Comprehensive gene database (function, aliases, pathways, diseases)
-- **arXiv**: Computational biology preprints (cutting-edge methods)
-- **Tavily**: Real-time web search with AI-generated answers (hallucination reduction)
-- **Progressive Search Strategy**: 
-  - Level 1: `gene + disease + variant` (most specific)
-  - Level 2: `gene + disease` OR `gene + variant`
-  - Level 3: `gene only` (fallback)
-- **Query Tracking**: Each result includes `query_used` field for transparency
-- **Hallucination Reduction**: Tavily provides grounded, fact-checked web information
+#### Performance
 
-**6. Key Advantages Over Basic RAG**
-- ✅ **Planning**: Structured approach vs. ad-hoc queries
-- ✅ **Collaboration**: Multiple specialized agents vs. single monolithic agent
-- ✅ **Multi-Source**: 4 complementary sources (PubMed + GeneCards + arXiv + Tavily) vs. PubMed only
-- ✅ **Progressive Search**: Specific → general with automatic fallback
-- ✅ **Hallucination Reduction**: Tavily provides grounded web facts
-- ✅ **Reflection**: Self-assessment and improvement vs. one-shot generation
-- ✅ **Quality Scores**: Quantitative evaluation (0-10 scale) vs. subjective assessment
-- ✅ **Iterative**: Automatic refinement vs. manual review
-```
-Literature Retrieval → 4 sources collected
-                       ↓
-        ┌──────────────┼──────────────┬──────────────┐
-        ↓              ↓              ↓              ↓
-     PubMed       GeneCards        arXiv         Tavily
-        │              │              │              │
-        └──────────────┴──────────────┘              │
-                       ↓                             │
-              FAISS Vector Store                     │
-              (3 sources embedded)                   │
-                       ↓                             │
-                   RAG Analysis ←───────────────────┘
-                   (FAISS retrieval + Tavily direct)
-```
-
-#### 🎯 Agentic Advantages
-
-- **Autonomy**: Self-directed planning and execution without manual intervention
-- **Collaboration**: Specialized agents coordinate to solve complex tasks
-- **Reflection**: Self-assessment and iterative improvement of outputs
-- **Scalability**: Processes hundreds of genes without human bottlenecks
-- **Evidence-Grounded**: Reduces hallucinations through FAISS-powered RAG + reflection
-- **Transparency**: Provides traceable reasoning with quality scores and execution history
-- **Adaptability**: Dynamic planning adjusts to different analysis goals
-- **Quality Assurance**: Automated scoring on 5 dimensions ensures consistent standards
-
-This agentic approach transforms manual variant curation into an intelligent, self-improving system that maintains scientific rigor while dramatically improving throughput and consistency.
+| Metric | Value |
+|--------|-------|
+| Multi-agent curation time | ~100s per gene |
+| Multi-source retrieval time | ~12s per gene |
+| Quality score range | 6-9/10 |
+| Hallucination reduction (with Tavily) | ~40% decrease |
 
 ---
 
+### Materials and Methods
 
-**Performance:**
-- Agentic analysis: ~100s per gene, Quality: 6-9/10
-- Multi-source retrieval: ~12s per gene, 4 sources
-- Iterative refinement: Up to 400% quality improvement
-- Hallucination rate: ↓40% with Tavily integration
+#### Data Sources
+
+| Source | Purpose | Reference |
+|--------|---------|-----------|
+| [PrimeKG](https://zitniklab.hms.harvard.edu/projects/PrimeKG/) | Knowledge graph: gene-disease-pathway-phenotype associations | Download `kg.csv` to `./db` |
+| [PubMed](https://pubmed.ncbi.nlm.nih.gov/) | Peer-reviewed biomedical abstracts | E-utilities API |
+| [GeneCards](https://www.genecards.org/) | Gene function, aliases, pathways, disease associations | HTML scraping |
+| [arXiv](https://arxiv.org/) | Computational biology preprints | Atom API |
+| [Tavily](https://tavily.com/) | Real-time web search with AI-synthesized answers | REST API (requires key) |
+| [ClinVar](https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/) | Variant-level clinical significance | Tab-delimited download |
+
+#### Tools and Algorithms
+
+| Component | Tool | Why this choice |
+|-----------|------|-----------------|
+| Phasing | [HapCUT2](https://github.com/vibansal/HapCUT2) | State-of-the-art haplotype assembly from short reads |
+| Variant calling | [DeepVariant](https://github.com/google/deepvariant) | Deep learning caller, highest accuracy in PrecisionFDA benchmarks |
+| Variant annotation | [VEP](https://www.ensembl.org/vep) | Ensembl standard, supports consequence prediction and IMPACT classification |
+| Vector store | [FAISS](https://github.com/facebookresearch/faiss) | Fast approximate nearest neighbor search; handles million-scale embeddings efficiently |
+| Embeddings | [sentence-transformers/all-MiniLM-L6-v2](https://www.sbert.net/) | Good balance of speed and quality for biomedical text |
+| LLM (Output Agent) | [DeepSeek](https://deepseek.com/) | Originally chosen for cost-effectiveness (2025); alternatives: [MiniMax](https://platform.minimaxi.com/), [Kimi](https://platform.moonshot.cn/) |
+| LLM (Review Agent) | [Grok](https://x.ai/) | xAI model with strong search grounding; different LLM reduces shared blind spots in review |
+| LLM framework | [LangChain](https://github.com/langchain-ai/langchain) | Text splitting, FAISS integration, retriever abstraction |
+
+#### Multi-Agent Architecture (v2)
+
+The v2 workflow separates generation and evaluation into two independent agents:
+
+- **Output Agent (DeepSeek)** -- Receives RAG context (FAISS: PubMed + GeneCards + arXiv), Tavily web context, and knowledge graph associations. Generates structured gene analysis. On subsequent iterations, receives Review Agent feedback and revises accordingly.
+- **Review Agent (Grok/xAI)** -- Independently scores the analysis on 5 dimensions (completeness, accuracy, evidence support, clarity, clinical utility). Flags potential hallucinations by cross-referencing against literature context. Returns structured JSON feedback.
+- **Orchestrator** -- Runs the Output Agent -> Review Agent loop up to N iterations. Stops early if quality threshold (7.0/10) is met.
+
+Using different LLMs for generation (DeepSeek) vs review (Grok) is intentional: it eliminates shared blind spots that occur when the same model evaluates its own output. Grok's strong web search grounding also improves fact-checking. This design ensures the reviewer cannot be biased by the generation process (separate models, separate system prompts, separate concerns).
+
+#### Comparison of Approaches
+
+| Approach | Context | Agents | Quality Control | Hallucination Mitigation |
+|----------|---------|--------|-----------------|--------------------------|
+| `llm_queryAlone` | None | 1 | None | None |
+| `llm_augmented` | PubMed text | 1 | None | Literature grounding |
+| `llm_rag` | FAISS (PubMed+GeneCards+arXiv) + Tavily | 1 | None | RAG + web facts |
+| `llm_agentic --legacy` | Same as RAG | 7 (planning/execution/reflection) | Self-reflection loop | RAG + reflection |
+| `llm_agentic` (v2, default) | Same as RAG | 2 (DeepSeek + Grok) | Independent review agent (different LLM) | RAG + cross-model review + hallucination flagging |
 
 ---
 
-### Data Input
-Data input as the output phased.vcf.gz from [cWGS](https://github.com/Complete-Genomics/DNBSEQ_Complete_WGS/tree/dev).  
+### Setup
 
+1. Create conda environment:
+   ```bash
+   conda env create -f environment.yml
+   conda activate dev
+   ```
 
-### Methods and Materials  
+2. Set API keys in `.env` (see `.env.example`):
+   ```
+   DEEPSEEK_API_KEY=your-key       # Output Agent
+   GROK_API_KEY=your-key            # Review Agent (https://console.x.ai/)
+   TAVILY_API_KEY=your-key          # Web search
+   PUBMED_EMAIL=your.email@example.com
+   ```
 
-**Data Sources:**
-1. **Knowledge Graph**: [PrimeKG](https://zitniklab.hms.harvard.edu/projects/PrimeKG/) - Download kg.csv to ./db
-2. **Literature Sources**:
-   - [PubMed](https://pubmed.ncbi.nlm.nih.gov/) - Biomedical abstracts
-   - [GeneCards](https://www.genecards.org/) - Comprehensive gene database
-   - [arXiv](https://arxiv.org/) - Computational biology preprints
-   - [Tavily](https://tavily.com/) - Real-time web search API
-3. **Variant Data**: [ClinVar](https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/) - Variant summary
+3. Download PrimeKG knowledge graph:
+   ```bash
+   # Download kg.csv from https://zitniklab.hms.harvard.edu/projects/PrimeKG/
+   # Place in ./db/kg.csv
+   ```
 
-**Tools & Frameworks:**
-1. **Phasing**: [Hapcut2](https://github.com/vibansal/HapCUT2)
-2. **Variant Annotation**: [VEP](https://www.ensembl.org/vep)
-3. **Vector Store**: [FAISS](https://github.com/facebookresearch/faiss)
-4. **LLM Framework**: [Langchain](https://github.com/hwchase17/langchain)
-5. **LLM Model**: [DeepSeek](https://deepseek.com/)
-6. **Environment**: Set environment.yml
- 
+4. Prepare phased VCF input (output from [cWGS pipeline](https://github.com/Complete-Genomics/DNBSEQ_Complete_WGS/tree/dev)).
 
-### On Going  
-1. Improve Pubmed, ClinVar based variant curation with LLM RAG  
-2. Implement regulatory elements (promoter, enhancer etc.)  
-3. Evaluation and improvement of agentic results    
+---
 
+### Project Structure
 
-### References  
+```
+.
+├── src/
+│   ├── explore_phased_vcf.py       # Step 1: variant discovery
+│   ├── vep.py                      # VEP annotation parsing
+│   ├── primeKG.py                  # Knowledge graph queries
+│   ├── visualize_gene_pathway_disease_phenotype.py
+│   ├── literature_retrieval.py     # Step 2: multi-source literature search
+│   ├── llm_agentic.py             # Step 3: main entry point (v2 default)
+│   ├── multi_agent_workflow.py     # v2 multi-agent (Output Agent + Review Agent)
+│   ├── agentic_framework.py        # v1 legacy (planning+execution+reflection)
+│   ├── planning_agent.py           # v1 planning agent
+│   ├── reflection_agent.py         # v1 reflection agent
+│   ├── llm_rag.py                  # Single-agent RAG approach
+│   ├── llm_augmented.py            # Simple literature augmentation
+│   ├── llm_queryAlone.py           # LLM-only baseline
+│   └── config.py                   # API key management
+├── data/                           # Phased VCF input
+├── db/                             # PrimeKG kg.csv, reference genome index
+├── results/                        # All outputs (JSON, reports, FAISS indices)
+├── images/                         # Documentation images
+├── gene_list.json                  # Genes of interest (user-created)
+├── environment.yml                 # Conda environment
+└── .env                            # API keys (not committed)
+```
 
-1. [VEP](https://www.ensembl.org/vep) - Variant Effect Predictor
-2. [CWGS](https://github.com/CGI-stLFR/CompleteWGS) - Complete WGS pipeline
-3. [stLFR](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6499310/) - Co-barcoded NGS reads
-4. [Lariat](https://github.com/10XGenomics/lariat) - Linked-Read Alignment Tool
-5. [DeepVariant](https://github.com/google/deepvariant) - Deep learning-based variant caller
-6. [Hapcut2](https://github.com/vibansal/HapCUT2) - Haplotype phasing
-7. [PubMed](https://pubmed.ncbi.nlm.nih.gov/) - Biomedical literature database
-8. [GeneCards](https://www.genecards.org/) - Comprehensive gene database
-9. [arXiv](https://arxiv.org/) - Preprint repository
-10. [Tavily](https://tavily.com/) - Real-time web search API
-11. [ClinVar](https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/) - Variant summary
-12. [PrimeKG](https://zitniklab.hms.harvard.edu/projects/PrimeKG/) - Knowledge graph
-13. [FAISS](https://github.com/facebookresearch/faiss) - Vector similarity search
-14. [Langchain](https://github.com/hwchase17/langchain) - LLM application framework
-15. [DeepSeek](https://deepseek.com/) - Large language model
-16. [Sentence Transformers](https://www.sbert.net/) - Text embeddings
-17. [Agentic AI](https://github.com/coursera/agentic-ai-public) - Multi-agent patterns
-18. [LangGraph](https://github.com/langchain-ai/langgraph) - Agent orchestration
-19. [liftOver](http://hgdownload.cse.ucsc.edu/goldenPath/hg38/liftOver/) - Genome coordinate conversion
-20. [HuggingFace](https://huggingface.co/) - Model hub and transformers
+---
+
+### Discussion and Ongoing Work
+
+**Current limitations:**
+- Variant curation (`_variant_curator_agent`) is a placeholder; full ClinVar integration is in progress to achieve variant -> disease/phenotype curation.
+- Regulatory element analysis (promoters, enhancers) is not yet implemented.
+- Quality scores depend on the LLM's self-assessment ability, which can be inconsistent.
+- GeneCards scraping may break with website changes; a direct API integration would be more robust.
+
+**Planned improvements:**
+1. Full ClinVar-based variant curation with structured evidence levels (pathogenic/likely pathogenic/VUS).
+2. Regulatory element annotation (promoter, enhancer, UTR variants).
+3. Systematic evaluation: compare multi-agent output against manually curated gold-standard gene reports.
+4. LangGraph integration for stateful agent orchestration with checkpointing.
+5. Batch processing optimization for large gene panels (100+ genes).
+
+---
+
+### References
+
+1. [cWGS](https://github.com/Complete-Genomics/DNBSEQ_Complete_WGS/tree/dev) - Complete WGS pipeline (DeepVariant + HapCUT2)
+2. [DeepVariant](https://github.com/google/deepvariant) - Deep learning variant caller
+3. [HapCUT2](https://github.com/vibansal/HapCUT2) - Haplotype phasing
+4. [VEP](https://www.ensembl.org/vep) - Variant Effect Predictor
+5. [PrimeKG](https://zitniklab.hms.harvard.edu/projects/PrimeKG/) - Precision Medicine Knowledge Graph
+6. [PubMed](https://pubmed.ncbi.nlm.nih.gov/) - Biomedical literature
+7. [GeneCards](https://www.genecards.org/) - Gene database
+8. [arXiv](https://arxiv.org/) - Preprints
+9. [Tavily](https://tavily.com/) - Web search API
+10. [ClinVar](https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/) - Variant clinical significance
+11. [FAISS](https://github.com/facebookresearch/faiss) - Vector similarity search
+12. [LangChain](https://github.com/langchain-ai/langchain) - LLM application framework
+13. [DeepSeek](https://deepseek.com/) - LLM for Output Agent (originally chosen 2025; alternatives: MiniMax/Kimi)
+14. [Grok](https://x.ai/) - LLM for Review Agent (xAI, strong search grounding)
+15. [Sentence Transformers](https://www.sbert.net/) - Text embeddings
+16. [stLFR](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6499310/) - Co-barcoded NGS reads
+17. [liftOver](http://hgdownload.cse.ucsc.edu/goldenPath/hg38/liftOver/) - Genome coordinate conversion
 
