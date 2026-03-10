@@ -74,15 +74,6 @@ python llm_augmented.py      # LLM + PubMed text (simple augmentation)
 python llm_rag.py            # LLM + FAISS RAG (single-agent)
 ```
 
-#### Performance
-
-| Metric | Value |
-|--------|-------|
-| Multi-agent curation time | ~100s per gene |
-| Multi-source retrieval time | ~12s per gene |
-| Quality score range | 6-9/10 |
-| Hallucination reduction (with Tavily) | ~40% decrease |
-
 ---
 
 ### Materials and Methods
