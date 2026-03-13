@@ -16,7 +16,7 @@
 
 ### 系统架构
 
-![flowchart](images/flowchart.jpg)  
+![flowchart](docs/flowchart.mmd)  
 
 系统分三步运行：
 

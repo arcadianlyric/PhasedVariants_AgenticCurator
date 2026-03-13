@@ -15,7 +15,7 @@ This project automates that interpretation using a multi-agent LLM workflow with
 ---
 
 ### Architecture
-![flowchart](images/flowchart.jpg)  
+![flowchart](docs/flowchart.mmd)   
 
 The system operates in three steps:
 
