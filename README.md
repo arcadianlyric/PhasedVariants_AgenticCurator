@@ -15,7 +15,46 @@ This project automates that interpretation using a multi-agent LLM workflow with
 ---
 
 ### Architecture
-![flowchart](docs/flowchart.mmd)   
+'''
+flowchart TD
+    subgraph Input
+        VCF[Phased VCF<br/>DeepVariant + HapCUT2]
+        KG[(PrimeKG<br/>Knowledge Graph)]
+    end
+
+    subgraph Step1[Step 1: Variant Discovery]
+        VEP[VEP Annotation]
+        HAP[Haplotype Analysis<br/>HIGH impact on both copies]
+        NET[Gene Network<br/>Disease / Pathway / Phenotype]
+    end
+
+    subgraph Step2[Step 2: Literature Retrieval]
+        PM[PubMed]
+        GC[GeneCards]
+        AX[arXiv]
+        TV[Tavily Web Search]
+    end
+
+    subgraph Step3[Step 3: Multi-Agent Curation]
+        OA[Output Agent<br/>RAG Analysis + KG Context]
+        RA[Review Agent<br/>Quality Scoring + Hallucination Check]
+        OA -->|analysis| RA
+        RA -->|feedback| OA
+    end
+
+    subgraph Output
+        RPT[Curated Report<br/>per gene, scored 0-10]
+    end
+
+    VCF --> VEP --> HAP --> NET
+    KG --> NET
+    NET -->|gene_list.json| Step2
+    PM & GC & AX --> FAISS[FAISS Vector Store]
+    TV --> DirectCtx[Direct Context]
+    FAISS & DirectCtx --> OA
+    KG --> OA
+    RA --> RPT
+'''
 
 The system operates in three steps:
 
