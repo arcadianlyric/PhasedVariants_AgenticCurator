@@ -15,7 +15,7 @@ This project automates that interpretation using a multi-agent LLM workflow with
 ---
 
 ### Architecture
-'''
+```mermaid
 flowchart TD
     subgraph Input
         VCF[Phased VCF<br/>DeepVariant + HapCUT2]
@@ -54,7 +54,7 @@ flowchart TD
     FAISS & DirectCtx --> OA
     KG --> OA
     RA --> RPT
-'''
+```  
 
 The system operates in three steps:
 
