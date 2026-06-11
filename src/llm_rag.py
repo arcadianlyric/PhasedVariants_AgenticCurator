@@ -6,13 +6,22 @@ Reads genes from gene_list.txt and uses PubMed literature to prevent hallucinati
 
 import json
 import requests
-from pathlib import Path
 import time
 import os
+from pathlib import Path
+
+# SentenceTransformers uses PyTorch here. Prevent transformers from importing
+# TensorFlow/Flax at embedding initialization, which can hang in this env.
+os.environ.setdefault("TRANSFORMERS_NO_TF", "1")
+os.environ.setdefault("USE_TF", "0")
+os.environ.setdefault("USE_FLAX", "0")
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 from langchain.embeddings import HuggingFaceEmbeddings
+
+
+RESULTS_DIR = Path(__file__).resolve().parent.parent / "results"
 
 def read_gene_list(gene_file="../gene_list.txt"):
     """Read gene list from file"""
@@ -32,7 +41,7 @@ def get_or_create_vector_store(gene_name):
     Load or create a FAISS vector store for a specific gene.
     Now includes: PubMed + GeneCards + arXiv (Tavily is used directly)
     """
-    results_dir = Path("../results")
+    results_dir = RESULTS_DIR
     vector_store_path = results_dir / f"{gene_name.lower()}_faiss_index"
 
     if vector_store_path.exists():
@@ -112,7 +121,7 @@ def get_tavily_context(gene_name):
     Get Tavily results directly (already RAG-processed by Tavily)
     Returns formatted string of Tavily AI answer and search results
     """
-    results_dir = Path("../results")
+    results_dir = RESULTS_DIR
     comp_file = results_dir / f"{gene_name.lower()}_comprehensive_literature.json"
     
     if not comp_file.exists():
