@@ -8,10 +8,11 @@ Replaces monolithic agentic_framework.py with a cleaner two-agent separation of 
 """
 
 import json
+import os
 import time
 import re
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Optional, TypedDict
 from datetime import datetime
 
 from config import get_deepseek_api_key, get_grok_api_key
@@ -311,6 +312,33 @@ Return ONLY valid JSON (no markdown fences):
 # Orchestrator: runs the Output Agent -> Review Agent loop
 # ---------------------------------------------------------------------------
 
+class WorkflowState(TypedDict):
+    gene_name: str
+    analysis: str
+    literature_context: str
+    review: Dict
+    history: List[Dict]
+    current_iteration: int
+    max_iterations: int
+
+
+try:
+    from langsmith import traceable
+except ImportError:
+    def traceable(name=None, **_kwargs):
+        def decorator(func):
+            return func
+        return decorator
+
+
+def _configure_langsmith_tracing():
+    """Enable LangSmith tracing when LANGSMITH_API_KEY is present."""
+    if not os.getenv("LANGSMITH_API_KEY"):
+        return
+    os.environ.setdefault("LANGCHAIN_TRACING_V2", "true")
+    os.environ.setdefault("LANGCHAIN_PROJECT", "phasedvariants-agentic-curator")
+
+
 class MultiAgentOrchestrator:
     """
     Orchestrates the two-agent loop:
@@ -328,6 +356,7 @@ class MultiAgentOrchestrator:
         self.output_agent = OutputAgent(gene_name, self.results_dir)
         self.review_agent = ReviewAgent()
         self.history: List[Dict] = []
+        _configure_langsmith_tracing()
 
     def run(self) -> Dict:
         """Execute full multi-agent workflow. Returns results dict."""
@@ -340,32 +369,18 @@ class MultiAgentOrchestrator:
         # Load literature context once for reviewer
         lit_ctx = self._load_literature_context()
 
-        # Initial generation
-        print(f"\n-- Iteration 1/{self.max_iterations + 1}: Initial Generation --")
-        analysis = self.output_agent.generate(feedback=None)
-
-        for iteration in range(1, self.max_iterations + 1):
-            # Review
-            print(f"\n-- Iteration {iteration}/{self.max_iterations}: Review --")
-            review = self.review_agent.review(self.gene_name, analysis, lit_ctx)
-            self.history.append({"iteration": iteration, "review": review})
-
-            if not review.get("needs_revision", False):
-                print(f"  Quality acceptable at iteration {iteration}.")
-                break
-
-            if iteration < self.max_iterations:
-                # Refine
-                print(f"\n-- Iteration {iteration + 1}/{self.max_iterations + 1}: Refinement --")
-                feedback = {**review, "previous_analysis": analysis}
-                analysis = self.output_agent.generate(feedback=feedback)
-            else:
-                print(f"  Max iterations reached. Final score: {review.get('overall_score', 0):.1f}/10")
-
-        # If no review happened (edge case), do a final review
-        if not self.history:
-            review = self.review_agent.review(self.gene_name, analysis, lit_ctx)
-            self.history.append({"iteration": 1, "review": review})
+        graph = self._build_graph()
+        final_state = graph.invoke({
+            "gene_name": self.gene_name,
+            "analysis": "",
+            "literature_context": lit_ctx,
+            "review": {},
+            "history": [],
+            "current_iteration": 1,
+            "max_iterations": self.max_iterations,
+        })
+        analysis = final_state["analysis"]
+        self.history = final_state["history"]
 
         elapsed = time.time() - start
         final_review = self.history[-1]["review"]
@@ -381,7 +396,9 @@ class MultiAgentOrchestrator:
             "metadata": {
                 "total_iterations": len(self.history),
                 "final_quality_score": final_review.get("overall_score", 0),
-                "workflow": "multi_agent_v2"
+                "workflow": "multi_agent_v2_langgraph",
+                "orchestrator": "LangGraph StateGraph",
+                "langsmith_tracing": os.getenv("LANGCHAIN_TRACING_V2", "").lower() == "true"
             }
         }
 
@@ -397,6 +414,68 @@ class MultiAgentOrchestrator:
         return results
 
     # -- helpers ----------------------------------------------------------
+
+    def _build_graph(self):
+        try:
+            from langgraph.graph import END, StateGraph
+        except ImportError as exc:
+            raise ImportError(
+                "LangGraph is required for the v2 orchestrator. "
+                "Install the environment from environment.yml or run: pip install langgraph"
+            ) from exc
+
+        workflow = StateGraph(WorkflowState)
+
+        workflow.add_node("generate", self._generate_node)
+        workflow.add_node("review", self._review_node)
+        workflow.add_node("refine", self._refine_node)
+        workflow.set_entry_point("generate")
+        workflow.add_edge("generate", "review")
+        workflow.add_conditional_edges(
+            "review",
+            self._route_after_review,
+            {"refine": "refine", "finish": END},
+        )
+        workflow.add_edge("refine", "review")
+        return workflow.compile()
+
+    @traceable(name="initial_generation")
+    def _generate_node(self, state: WorkflowState) -> Dict:
+        print(f"\n-- Iteration 1/{state['max_iterations'] + 1}: Initial Generation --")
+        return {"analysis": self.output_agent.generate(feedback=None)}
+
+    @traceable(name="review_analysis")
+    def _review_node(self, state: WorkflowState) -> Dict:
+        iteration = state["current_iteration"]
+        print(f"\n-- Iteration {iteration}/{state['max_iterations']}: Review --")
+        review = self.review_agent.review(
+            state["gene_name"],
+            state["analysis"],
+            state["literature_context"],
+        )
+        history = [*state["history"], {"iteration": iteration, "review": review}]
+        return {"review": review, "history": history}
+
+    def _route_after_review(self, state: WorkflowState) -> str:
+        review = state["review"]
+        iteration = state["current_iteration"]
+        if not review.get("needs_revision", False):
+            print(f"  Quality acceptable at iteration {iteration}.")
+            return "finish"
+        if iteration >= state["max_iterations"]:
+            print(f"  Max iterations reached. Final score: {review.get('overall_score', 0):.1f}/10")
+            return "finish"
+        return "refine"
+
+    @traceable(name="refine_analysis")
+    def _refine_node(self, state: WorkflowState) -> Dict:
+        iteration = state["current_iteration"]
+        print(f"\n-- Iteration {iteration + 1}/{state['max_iterations'] + 1}: Refinement --")
+        feedback = {**state["review"], "previous_analysis": state["analysis"]}
+        return {
+            "analysis": self.output_agent.generate(feedback=feedback),
+            "current_iteration": iteration + 1,
+        }
 
     def _load_literature_context(self) -> str:
         pubmed_file = self.results_dir / f"{self.gene_name.lower()}_pubmed_response.txt"

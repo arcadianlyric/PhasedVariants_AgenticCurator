@@ -21,3 +21,5 @@ pipeline_debug.json
 # IDE
 .vscode/
 .idea/
+
+memory/

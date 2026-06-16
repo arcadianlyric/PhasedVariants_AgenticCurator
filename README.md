@@ -10,7 +10,7 @@ Interpreting phased variants -- linking genotypes to gene function, disease mech
 
 This project automates that interpretation using a multi-agent LLM workflow with retrieval-augmented generation (RAG), knowledge graph integration, and iterative quality control.
 
-**Keywords:** Multi-Agent Systems, RAG, FAISS, LLM, Haplotype Phasing, Gene/Variant Curation, Knowledge Graph, PubMed, GeneCards, arXiv, Tavily, Hallucination Reduction
+**Keywords:** Multi-Agent Systems, RAG, FAISS, LLM, Haplotype Phasing, Gene/Variant Curation, Knowledge Graph, PubMed, GeneCards, arXiv, Tavily, Hallucination Reduction, LangChain, LangGraph, LangSmith
 
 ---
 
@@ -35,11 +35,18 @@ flowchart TD
         TV[Tavily Web Search]
     end
 
-    subgraph Step3[Step 3: Multi-Agent Curation]
-        OA[Output Agent<br/>RAG Analysis + KG Context]
-        RA[Review Agent<br/>Quality Scoring + Hallucination Check]
+    subgraph Step3[Step 3: LangGraph Multi-Agent Curation]
+        SG[StateGraph Orchestrator]
+        OA[Generate Node<br/>Output Agent / DeepSeek]
+        RA[Review Node<br/>Review Agent / Grok]
+        RF[Refine Node<br/>Revise with feedback]
+        LS[(LangSmith Trace<br/>optional)]
+        SG --> OA
         OA -->|analysis| RA
-        RA -->|feedback| OA
+        RA -->|score >= 7.0| RPT
+        RA -->|needs revision| RF
+        RF -->|updated analysis| RA
+        SG -. trace .-> LS
     end
 
     subgraph Output
@@ -53,7 +60,6 @@ flowchart TD
     TV --> DirectCtx[Direct Context]
     FAISS & DirectCtx --> OA
     KG --> OA
-    RA --> RPT
 ```  
 
 The system operates in three steps:
@@ -140,6 +146,7 @@ python llm_rag.py            # LLM + FAISS RAG (single-agent)
 | LLM (Output Agent) | [DeepSeek](https://deepseek.com/) | Originally chosen for cost-effectiveness (2025); alternatives: [MiniMax](https://platform.minimaxi.com/), [Kimi](https://platform.moonshot.cn/) |
 | LLM (Review Agent) | [Grok](https://x.ai/) | xAI model with strong search grounding; different LLM reduces shared blind spots in review |
 | LLM framework | [LangChain](https://github.com/langchain-ai/langchain) | Text splitting, FAISS integration, retriever abstraction |
+| Agent orchestration | [LangGraph](https://github.com/langchain-ai/langgraph) + optional [LangSmith](https://smith.langchain.com/) | Stateful Output -> Review -> Refine graph; LangSmith is optional and only used for trace observability |
 
 #### Multi-Agent Architecture (v2)
 
@@ -147,9 +154,11 @@ The v2 workflow separates generation and evaluation into two independent agents:
 
 - **Output Agent (DeepSeek)** -- Receives RAG context (FAISS: PubMed + GeneCards + arXiv), Tavily web context, and knowledge graph associations. Generates structured gene analysis. On subsequent iterations, receives Review Agent feedback and revises accordingly.
 - **Review Agent (Grok/xAI)** -- Independently scores the analysis on 5 dimensions (completeness, accuracy, evidence support, clarity, clinical utility). Flags potential hallucinations by cross-referencing against literature context. Returns structured JSON feedback.
-- **Orchestrator** -- Runs the Output Agent -> Review Agent loop up to N iterations. Stops early if quality threshold (7.0/10) is met.
+- **LangGraph Orchestrator** -- Defines Output Agent, Review Agent, and Refinement as `StateGraph` nodes. Conditional edges stop early when the quality threshold (7.0/10) is met or route back to refinement until max iterations are reached.
 
 Using different LLMs for generation (DeepSeek) vs review (Grok) is intentional: it eliminates shared blind spots that occur when the same model evaluates its own output. Grok's strong web search grounding also improves fact-checking. This design ensures the reviewer cannot be biased by the generation process (separate models, separate system prompts, separate concerns).
+
+LangSmith is optional. The workflow runs without `LANGSMITH_API_KEY`; set it only when you want cloud tracing/debugging for the LangGraph generate/review/refine nodes. When enabled, traces are recorded under `LANGCHAIN_PROJECT` (default: `phasedvariants-agentic-curator`).
 
 #### Comparison of Approaches
 
@@ -177,6 +186,8 @@ Using different LLMs for generation (DeepSeek) vs review (Grok) is intentional: 
    GROK_API_KEY=your-key            # Review Agent (https://console.x.ai/)
    TAVILY_API_KEY=your-key          # Web search
    PUBMED_EMAIL=your.email@example.com
+   LANGSMITH_API_KEY=your-key       # Optional: LangGraph cloud tracing/debugging only
+   LANGCHAIN_PROJECT=phasedvariants-agentic-curator  # Optional LangSmith project name
    ```
 
 3. Download PrimeKG knowledge graph:
@@ -231,7 +242,7 @@ Using different LLMs for generation (DeepSeek) vs review (Grok) is intentional: 
 1. Full ClinVar-based variant curation with structured evidence levels (pathogenic/likely pathogenic/VUS).
 2. Regulatory element annotation (promoter, enhancer, UTR variants).
 3. Systematic evaluation: compare multi-agent output against manually curated gold-standard gene reports.
-4. LangGraph integration for stateful agent orchestration with checkpointing.
+4. Persistent LangGraph checkpointing for resumable long-running analyses.
 5. Batch processing optimization for large gene panels (100+ genes).
 
 ---
@@ -255,4 +266,3 @@ Using different LLMs for generation (DeepSeek) vs review (Grok) is intentional: 
 15. [Sentence Transformers](https://www.sbert.net/) - Text embeddings
 16. [stLFR](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6499310/) - Co-barcoded NGS reads
 17. [liftOver](http://hgdownload.cse.ucsc.edu/goldenPath/hg38/liftOver/) - Genome coordinate conversion
-

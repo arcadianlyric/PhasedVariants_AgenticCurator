@@ -10,7 +10,7 @@
 
 本项目使用多智能体 LLM 工作流（结合检索增强生成 RAG、知识图谱和迭代质量控制）自动化完成这一解读过程。
 
-**关键词：** 多智能体系统, RAG, FAISS, LLM, 单倍型分相, 基因/变异解读, 知识图谱, PubMed, GeneCards, arXiv, Tavily, 幻觉抑制
+**关键词：** 多智能体系统, RAG, FAISS, LLM, 单倍型分相, 基因/变异解读, 知识图谱, PubMed, GeneCards, arXiv, Tavily, 幻觉抑制, LangChain, LangGraph, LangSmith
 
 ---
 
@@ -36,11 +36,18 @@ flowchart TD
         TV[Tavily Web Search]
     end
 
-    subgraph Step3[Step 3: Multi-Agent Curation]
-        OA[Output Agent<br/>RAG Analysis + KG Context]
-        RA[Review Agent<br/>Quality Scoring + Hallucination Check]
+    subgraph Step3[Step 3: LangGraph Multi-Agent Curation]
+        SG[StateGraph Orchestrator]
+        OA[Generate Node<br/>Output Agent / DeepSeek]
+        RA[Review Node<br/>Review Agent / Grok]
+        RF[Refine Node<br/>Revise with feedback]
+        LS[(LangSmith Trace<br/>optional)]
+        SG --> OA
         OA -->|analysis| RA
-        RA -->|feedback| OA
+        RA -->|score >= 7.0| RPT
+        RA -->|needs revision| RF
+        RF -->|updated analysis| RA
+        SG -. trace .-> LS
     end
 
     subgraph Output
@@ -54,7 +61,6 @@ flowchart TD
     TV --> DirectCtx[Direct Context]
     FAISS & DirectCtx --> OA
     KG --> OA
-    RA --> RPT
 ```
 
 系统分三步运行：
@@ -150,6 +156,7 @@ python llm_rag.py            # LLM + FAISS RAG（单智能体）
 | LLM（输出智能体） | [DeepSeek](https://deepseek.com/) | 最初（2025 年）因性价比选择；备选：[MiniMax](https://platform.minimaxi.com/)、[Kimi](https://platform.moonshot.cn/) |
 | LLM（审查智能体） | [Grok](https://x.ai/) | xAI 模型，搜索锚定能力强；不同 LLM 减少审查中的共同盲区 |
 | LLM 框架 | [LangChain](https://github.com/langchain-ai/langchain) | 文本分块、FAISS 集成、检索器抽象 |
+| 智能体编排 | [LangGraph](https://github.com/langchain-ai/langgraph) + 可选 [LangSmith](https://smith.langchain.com/) | 有状态 Output -> Review -> Refine 图编排；LangSmith 是可选项，仅用于 trace 观测 |
 
 #### 多智能体架构（v2）
 
@@ -157,9 +164,11 @@ v2 工作流将生成和评估分离为两个独立智能体：
 
 - **输出智能体（Output Agent / DeepSeek）** -- 接收 RAG 上下文（FAISS: PubMed + GeneCards + arXiv）、Tavily 网络上下文和知识图谱关联。生成结构化的基因分析。后续迭代中，接收审查智能体的反馈并据此修改。
 - **审查智能体（Review Agent / Grok）** -- 使用不同的 LLM，独立地在 5 个维度（完整性、准确性、证据支持、清晰度、临床实用性）上评分。通过交叉引用文献上下文标记潜在幻觉。返回结构化 JSON 反馈。
-- **编排器（Orchestrator）** -- 运行输出智能体 -> 审查智能体的循环，最多 N 次迭代。如果质量达到阈值（7.0/10）则提前停止。
+- **LangGraph 编排器（Orchestrator）** -- 将输出、审查和修订定义为 `StateGraph` 节点。条件边在质量达到阈值（7.0/10）时提前停止，否则继续进入修订，直到达到最大迭代次数。
 
 生成（DeepSeek）和审查（Grok）使用不同 LLM 是有意为之：消除同一模型评估自身输出时的共同盲区。Grok 的搜索锚定能力也有助于事实核查。这种设计确保审查者不受生成过程的偏见影响（不同模型、独立系统提示词、独立关注点）。
+
+LangSmith 是可选项。不设置 `LANGSMITH_API_KEY` 时 workflow 仍可正常运行；只有需要云端 tracing/debugging 时才需要设置。启用后，LangGraph 的生成、审查和修订节点 trace 会记录到 `LANGCHAIN_PROJECT`（默认 `phasedvariants-agentic-curator`）。
 
 #### 方案对比
 
@@ -187,6 +196,8 @@ v2 工作流将生成和评估分离为两个独立智能体：
    GROK_API_KEY=your-key            # 审查智能体（https://console.x.ai/）
    TAVILY_API_KEY=your-key          # 网络搜索
    PUBMED_EMAIL=your.email@example.com
+   LANGSMITH_API_KEY=your-key       # 可选：仅用于 LangGraph 云端 tracing/debugging
+   LANGCHAIN_PROJECT=phasedvariants-agentic-curator  # 可选 LangSmith 项目名
    ```
 
 3. 下载 PrimeKG 知识图谱：
@@ -241,7 +252,7 @@ v2 工作流将生成和评估分离为两个独立智能体：
 1. 完整的基于 ClinVar 的变异解读，包含结构化证据等级（致病性/可能致病/VUS）。
 2. 调控元件注释（启动子、增强子、UTR 变异）。
 3. 系统评估：将多智能体输出与人工解读的金标准基因报告进行对比。
-4. 集成 LangGraph 实现有状态的智能体编排与断点续传。
+4. 增加 LangGraph 持久化 checkpoint，支持长任务断点续跑。
 5. 大基因 panel（100+ 基因）的批处理优化。
 
 ---
