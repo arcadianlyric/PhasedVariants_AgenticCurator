@@ -35,18 +35,32 @@ flowchart TD
         TV[Tavily Web Search]
     end
 
-    subgraph Step3[Step 3: LangGraph Multi-Agent Curation]
-        SG[StateGraph Orchestrator]
-        OA[Generate Node<br/>Output Agent / DeepSeek]
-        RA[Review Node<br/>Review Agent / Grok]
-        RF[Refine Node<br/>Revise with feedback]
-        LS[(LangSmith Trace<br/>optional)]
-        SG --> OA
-        OA -->|analysis| RA
-        RA -->|score >= 7.0| RPT
-        RA -->|needs revision| RF
-        RF -->|updated analysis| RA
-        SG -. trace .-> LS
+    subgraph Step3[Step 3: Multi-Agent Curation]
+        direction TB
+
+        subgraph v2[v2 — LangGraph two-agent loop]
+            SG[StateGraph Orchestrator]
+            OA[Generate Node<br/>Output Agent / DeepSeek]
+            RA[Review Node<br/>Review Agent / Grok]
+            RF[Refine Node<br/>Revise with feedback]
+            LS[(LangSmith Trace<br/>optional)]
+            SG --> OA
+            OA -->|analysis| RA
+            RA -->|score >= 7.0| RPT
+            RA -->|needs revision| RF
+            RF -->|updated analysis| RA
+            SG -. trace .-> LS
+        end
+
+        subgraph v3[v3 Harness — three-agent sprint loop]
+            PL[Planner<br/>DeepSeek — AnalysisSpec]
+            CN[Contract Negotiation<br/>Generator proposes · Evaluator hardens]
+            GN[Generator<br/>DeepSeek — SprintArtifact]
+            EV[Evaluator<br/>Grok + PubMed re-query + PrimeKG]
+            PL --> CN --> GN --> EV
+            EV -->|PASS| RPT
+            EV -->|FAIL refine/pivot| GN
+        end
     end
 
     subgraph Output
@@ -59,14 +73,109 @@ flowchart TD
     PM & GC & AX --> FAISS[FAISS Vector Store]
     TV --> DirectCtx[Direct Context]
     FAISS & DirectCtx --> OA
+    FAISS & DirectCtx --> GN
     KG --> OA
-```  
+    KG --> GN
+```
 
 The system operates in three steps:
 
 1. **Variant Discovery** -- Parse phased VCF, identify variants with VEP HIGH impact on both haplotypes, and build gene networks via PrimeKG.
 2. **Literature Retrieval** -- Multi-source progressive search (gene+disease+variant -> gene+disease -> gene only) across PubMed, GeneCards, arXiv, and Tavily.
-3. **Multi-Agent Curation** -- An Output Agent generates literature-grounded analysis; a Review Agent independently evaluates quality (5 dimensions, 0-10 scale) and flags hallucinations. The loop iterates until the quality threshold is met.
+3. **Multi-Agent Curation** -- Two workflow options (see below). Both use DeepSeek for generation and Grok for review to eliminate shared blind spots.
+
+---
+
+### Materials and Methods
+
+#### Architecture Rationale: Hybrid Rule-Based + Agentic
+
+This project deliberately avoids a fully end-to-end agent-driven workflow. In high-reliability domains such as bioinformatics and pharmaceutical analysis, pure agentic pipelines are still fragile: LLM outputs can vary across runs, and a small hallucination or poor decision early in a long chain can be amplified into a broken workflow.
+
+The chosen design is a hybrid architecture. Deterministic, repeatable steps remain rule-based and auditable; agents are inserted only where ambiguity, literature reasoning, or expert-style judgment is useful.
+
+| Scenario | Recommended approach | Why |
+|----------|----------------------|-----|
+| Structured, repeated, predictable steps | Rule-based scripts or workflow engines such as Nextflow, Snakemake, CWL, or Airflow | Deterministic, auditable, version-controlled, parallelizable, and low cost |
+| Unstructured interpretation | Agent-assisted judgment, classification, anomaly detection, and hypothesis generation | LLMs are useful for fuzzy matching, literature synthesis, and detecting unusual patterns |
+| Overall orchestration | Rule-based workflow controls the pipeline; agents run inside selected nodes | Combines stability with adaptive reasoning |
+
+In this repository, variant parsing, VEP consequence extraction, knowledge-graph lookup, literature retrieval, and saved artifact evaluation are treated as deterministic pipeline steps. The agentic layer is limited to the gray areas: integrating heterogeneous literature evidence, deciding whether a gene report is sufficiently supported, flagging hallucination risk, revising weak analyses, and performing final sanity checks.
+
+#### Multi-Agent Architecture (v2 — LangGraph two-agent loop)
+
+The v2 workflow separates generation and evaluation into two independent agents:
+
+- **Output Agent (DeepSeek)** -- Receives RAG context (FAISS: PubMed + GeneCards + arXiv), Tavily web context, and knowledge graph associations. Generates structured gene analysis. On subsequent iterations, receives Review Agent feedback and revises accordingly.
+- **Review Agent (Grok/xAI)** -- Independently scores the analysis on 5 dimensions (completeness, accuracy, evidence support, clarity, clinical utility). Flags potential hallucinations by cross-referencing against literature context. Returns structured JSON feedback.
+- **LangGraph Orchestrator** -- Defines Output Agent, Review Agent, and Refinement as `StateGraph` nodes. Conditional edges stop early when the quality threshold (7.0/10) is met or route back to refinement until max iterations are reached.
+
+Using different LLMs for generation (DeepSeek) vs review (Grok) is intentional: it eliminates shared blind spots that occur when the same model evaluates its own output. Grok's strong web search grounding also improves fact-checking.
+
+LangSmith is optional. The workflow runs without `LANGSMITH_API_KEY`; set it only when you want cloud tracing/debugging for the LangGraph generate/review/refine nodes. When enabled, traces are recorded under `LANGCHAIN_PROJECT` (default: `phasedvariants-agentic-curator`).
+
+#### Harness Architecture (v3 — three-agent sprint loop)
+
+The v3 harness addresses two persistent failure modes in v2: (1) the evaluator being too lenient when grading the same model's output, and (2) the generator losing coherence across long analyses without structured checkpoints.
+
+Inspired by Anthropic's ["Harness design for long-running application development"](https://www.anthropic.com/engineering/harness-design-for-long-running-application-development) (Rajasekaran, 2026).
+
+**Three agents, five sprints:**
+
+| Agent | Model | Role |
+|-------|-------|------|
+| Planner | DeepSeek | Expands gene name → full `AnalysisSpec`: 5 sprints, literature targets, foreseeable hallucination pitfalls |
+| Generator | DeepSeek | Executes one sprint at a time against a negotiated contract; refines or pivots based on evaluator feedback |
+| Evaluator | Grok | Active verification: re-queries PubMed, cross-checks PrimeKG, scores 4 dimensions with hard floors |
+
+**Sprint contract negotiation** — Before each sprint, Generator proposes deliverables and verification criteria; Evaluator tightens them. Only after both agree does generation start. This prevents post-hoc redefinition of "done".
+
+**Active evaluation** — The Evaluator does not just read the output. It:
+1. Re-queries PubMed for every cited claim (zero hits = flagged)
+2. Cross-checks gene-disease associations against PrimeKG
+3. Applies few-shot calibration examples to prevent score drift toward leniency
+4. Enforces hard dimension floors: scientific accuracy ≥ 6.0, clinical utility ≥ 6.0, completeness ≥ 5.0
+5. Treats any `HIGH` hallucination risk as an automatic FAIL
+
+**Strategic decision after FAIL** — The Evaluator returns a `strategic_recommendation`: `refine` (keep direction, fix bugs) or `pivot` (start fresh with a different approach). The Generator acts on this recommendation in the next round.
+
+All artifacts — spec, contracts, sprint outputs, eval results, harness state — are written to `results/harness_runs/<run_id>/` after every step, making runs auditable and resumable.
+
+#### Comparison of Approaches
+
+| Approach | Context | Agents | Quality Control | Hallucination Mitigation |
+|----------|---------|--------|-----------------|--------------------------|
+| `llm_queryAlone` | None | 1 | None | None |
+| `llm_augmented` | PubMed text | 1 | None | Literature grounding |
+| `llm_rag` | FAISS (PubMed+GeneCards+arXiv) + Tavily | 1 | None | RAG + web facts |
+| `llm_agentic --legacy` | Same as RAG | 7 (planning/execution/reflection) | Self-reflection loop | RAG + reflection |
+| `llm_agentic` (v2) | Same as RAG | 2 (DeepSeek + Grok) | Independent review agent (different LLM) | RAG + cross-model review + hallucination flagging |
+| `harness` **(v3, recommended)** | Same as RAG | 3 (Planner + Generator + Evaluator) | Sprint contracts + active PubMed/KG verification + hard dimension floors | RAG + active claim re-querying + few-shot calibrated skeptical evaluator |
+
+#### Data Sources
+
+| Source | Purpose | Reference |
+|--------|---------|-----------|
+| [PrimeKG](https://zitniklab.hms.harvard.edu/projects/PrimeKG/) | Knowledge graph: gene-disease-pathway-phenotype associations | Download `kg.csv` to `./db` |
+| [PubMed](https://pubmed.ncbi.nlm.nih.gov/) | Peer-reviewed biomedical abstracts | E-utilities API |
+| [GeneCards](https://www.genecards.org/) | Gene function, aliases, pathways, disease associations | HTML scraping |
+| [arXiv](https://arxiv.org/) | Computational biology preprints | Atom API |
+| [Tavily](https://tavily.com/) | Real-time web search with AI-synthesized answers | REST API (requires key) |
+| [ClinVar](https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/) | Variant-level clinical significance | Tab-delimited download |
+
+#### Tools and Algorithms
+
+| Component | Tool | Why this choice |
+|-----------|------|-----------------|
+| Phasing | [HapCUT2](https://github.com/vibansal/HapCUT2) | State-of-the-art haplotype assembly from short reads |
+| Variant calling | [DeepVariant](https://github.com/google/deepvariant) | Deep learning caller, highest accuracy in PrecisionFDA benchmarks |
+| Variant annotation | [VEP](https://www.ensembl.org/vep) | Ensembl standard, supports consequence prediction and IMPACT classification |
+| Vector store | [FAISS](https://github.com/facebookresearch/faiss) | Fast approximate nearest neighbor search; handles million-scale embeddings efficiently |
+| Embeddings | [sentence-transformers/all-MiniLM-L6-v2](https://www.sbert.net/) | Good balance of speed and quality for biomedical text |
+| LLM (Output Agent) | [DeepSeek](https://deepseek.com/) | Originally chosen for cost-effectiveness (2025); alternatives: [MiniMax](https://platform.minimaxi.com/), [Kimi](https://platform.moonshot.cn/) |
+| LLM (Review Agent) | [Grok](https://x.ai/) | xAI model with strong search grounding; different LLM reduces shared blind spots in review |
+| LLM framework | [LangChain](https://github.com/langchain-ai/langchain) | Text splitting, FAISS integration, retriever abstraction |
+| Agent orchestration | [LangGraph](https://github.com/langchain-ai/langgraph) + optional [LangSmith](https://smith.langchain.com/) | Stateful Output -> Review -> Refine graph; LangSmith is optional and only used for trace observability |
 
 ---
 
@@ -100,11 +209,11 @@ python literature_retrieval.py
 - Sources: PubMed (biomedical abstracts), GeneCards (gene function/aliases/pathways), arXiv (computational biology preprints), Tavily (real-time web search with AI-synthesized answers).
 - Progressive search strategy with query tracking (`query_used` field) for transparency.
 
-#### Step 3: Multi-Agent Curation (Recommended)
+#### Step 3a: Multi-Agent Curation (v2)
 
 ```bash
 cd src
-python llm_agentic.py            # v2 multi-agent (default, recommended)
+python llm_agentic.py            # v2 multi-agent (LangGraph two-agent loop)
 python llm_agentic.py --legacy   # v1 planning+execution+reflection
 ```
 
@@ -119,56 +228,34 @@ python llm_augmented.py      # LLM + PubMed text (simple augmentation)
 python llm_rag.py            # LLM + FAISS RAG (single-agent)
 ```
 
----
+#### Step 3b: Harness v3 — Three-Agent Sprint Loop (Recommended)
 
-### Materials and Methods
+```bash
+# Single gene
+python -m harness.orchestrator P2RX5
 
-#### Data Sources
+# With optional VCF context string
+python -m harness.orchestrator P2RX5 --vcf "compound het: c.123A>G + c.456C>T"
 
-| Source | Purpose | Reference |
-|--------|---------|-----------|
-| [PrimeKG](https://zitniklab.hms.harvard.edu/projects/PrimeKG/) | Knowledge graph: gene-disease-pathway-phenotype associations | Download `kg.csv` to `./db` |
-| [PubMed](https://pubmed.ncbi.nlm.nih.gov/) | Peer-reviewed biomedical abstracts | E-utilities API |
-| [GeneCards](https://www.genecards.org/) | Gene function, aliases, pathways, disease associations | HTML scraping |
-| [arXiv](https://arxiv.org/) | Computational biology preprints | Atom API |
-| [Tavily](https://tavily.com/) | Real-time web search with AI-synthesized answers | REST API (requires key) |
-| [ClinVar](https://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/) | Variant-level clinical significance | Tab-delimited download |
+# Custom output directory
+python -m harness.orchestrator P2RX5 --results-dir /path/to/results
 
-#### Tools and Algorithms
+# From Python
+from harness import run_harness
+result = run_harness("P2RX5")
+```
 
-| Component | Tool | Why this choice |
-|-----------|------|-----------------|
-| Phasing | [HapCUT2](https://github.com/vibansal/HapCUT2) | State-of-the-art haplotype assembly from short reads |
-| Variant calling | [DeepVariant](https://github.com/google/deepvariant) | Deep learning caller, highest accuracy in PrecisionFDA benchmarks |
-| Variant annotation | [VEP](https://www.ensembl.org/vep) | Ensembl standard, supports consequence prediction and IMPACT classification |
-| Vector store | [FAISS](https://github.com/facebookresearch/faiss) | Fast approximate nearest neighbor search; handles million-scale embeddings efficiently |
-| Embeddings | [sentence-transformers/all-MiniLM-L6-v2](https://www.sbert.net/) | Good balance of speed and quality for biomedical text |
-| LLM (Output Agent) | [DeepSeek](https://deepseek.com/) | Originally chosen for cost-effectiveness (2025); alternatives: [MiniMax](https://platform.minimaxi.com/), [Kimi](https://platform.moonshot.cn/) |
-| LLM (Review Agent) | [Grok](https://x.ai/) | xAI model with strong search grounding; different LLM reduces shared blind spots in review |
-| LLM framework | [LangChain](https://github.com/langchain-ai/langchain) | Text splitting, FAISS integration, retriever abstraction |
-| Agent orchestration | [LangGraph](https://github.com/langchain-ai/langgraph) + optional [LangSmith](https://smith.langchain.com/) | Stateful Output -> Review -> Refine graph; LangSmith is optional and only used for trace observability |
+- **Input:** gene symbol (VCF context optional); literature files and `gene_associations.json` from Steps 1–2
+- **Output:**
+  - `results/{gene}_harness_analysis.json` — full structured results with per-sprint scores
+  - `results/{gene}_harness_report.md` — clinical report
+  - `results/harness_runs/<run_id>/` — all intermediate artifacts (spec, contracts, sprint outputs, eval results)
 
-#### Multi-Agent Architecture (v2)
+Verify a harness run against deterministic acceptance criteria:
 
-The v2 workflow separates generation and evaluation into two independent agents:
-
-- **Output Agent (DeepSeek)** -- Receives RAG context (FAISS: PubMed + GeneCards + arXiv), Tavily web context, and knowledge graph associations. Generates structured gene analysis. On subsequent iterations, receives Review Agent feedback and revises accordingly.
-- **Review Agent (Grok/xAI)** -- Independently scores the analysis on 5 dimensions (completeness, accuracy, evidence support, clarity, clinical utility). Flags potential hallucinations by cross-referencing against literature context. Returns structured JSON feedback.
-- **LangGraph Orchestrator** -- Defines Output Agent, Review Agent, and Refinement as `StateGraph` nodes. Conditional edges stop early when the quality threshold (7.0/10) is met or route back to refinement until max iterations are reached.
-
-Using different LLMs for generation (DeepSeek) vs review (Grok) is intentional: it eliminates shared blind spots that occur when the same model evaluates its own output. Grok's strong web search grounding also improves fact-checking. This design ensures the reviewer cannot be biased by the generation process (separate models, separate system prompts, separate concerns).
-
-LangSmith is optional. The workflow runs without `LANGSMITH_API_KEY`; set it only when you want cloud tracing/debugging for the LangGraph generate/review/refine nodes. When enabled, traces are recorded under `LANGCHAIN_PROJECT` (default: `phasedvariants-agentic-curator`).
-
-#### Comparison of Approaches
-
-| Approach | Context | Agents | Quality Control | Hallucination Mitigation |
-|----------|---------|--------|-----------------|--------------------------|
-| `llm_queryAlone` | None | 1 | None | None |
-| `llm_augmented` | PubMed text | 1 | None | Literature grounding |
-| `llm_rag` | FAISS (PubMed+GeneCards+arXiv) + Tavily | 1 | None | RAG + web facts |
-| `llm_agentic --legacy` | Same as RAG | 7 (planning/execution/reflection) | Self-reflection loop | RAG + reflection |
-| `llm_agentic` (v2, default) | Same as RAG | 2 (DeepSeek + Grok) | Independent review agent (different LLM) | RAG + cross-model review + hallucination flagging |
+```bash
+python eval_harness/run_harness.py --tasks eval_harness/tasks/p2rx5_harness_v2.json
+```
 
 ---
 
@@ -204,13 +291,21 @@ LangSmith is optional. The workflow runs without `LANGSMITH_API_KEY`; set it onl
 
 ```
 .
+├── harness/                        # Step 3b: three-agent harness (v3, recommended)
+│   ├── __init__.py                 # run_harness() entry point
+│   ├── artifacts.py                # Typed dataclasses: AnalysisSpec, SprintContract, SprintArtifact, EvalResult
+│   ├── planner_agent.py            # Expands gene name → 5-sprint AnalysisSpec
+│   ├── sprint_contract.py          # Generator-Evaluator contract negotiation
+│   ├── generator_agent.py          # Sprint-aware generator with refine/pivot strategy
+│   ├── evaluator_agent.py          # Skeptical evaluator: PubMed re-query + KG check + hard thresholds
+│   └── orchestrator.py             # Three-agent coordinator + CLI
 ├── src/
 │   ├── explore_phased_vcf.py       # Step 1: variant discovery
 │   ├── vep.py                      # VEP annotation parsing
 │   ├── primeKG.py                  # Knowledge graph queries
 │   ├── visualize_gene_pathway_disease_phenotype.py
 │   ├── literature_retrieval.py     # Step 2: multi-source literature search
-│   ├── llm_agentic.py             # Step 3: main entry point (v2 default)
+│   ├── llm_agentic.py             # Step 3a: v2 entry point
 │   ├── multi_agent_workflow.py     # v2 multi-agent (Output Agent + Review Agent)
 │   ├── agentic_framework.py        # v1 legacy (planning+execution+reflection)
 │   ├── planning_agent.py           # v1 planning agent
@@ -219,9 +314,16 @@ LangSmith is optional. The workflow runs without `LANGSMITH_API_KEY`; set it onl
 │   ├── llm_augmented.py            # Simple literature augmentation
 │   ├── llm_queryAlone.py           # LLM-only baseline
 │   └── config.py                   # API key management
+├── eval_harness/
+│   ├── run_harness.py              # Deterministic artifact checker (no LLM calls)
+│   └── tasks/
+│       ├── p2rx5_smoke.json        # v2 acceptance task
+│       └── p2rx5_harness_v2.json   # v3 harness acceptance task
 ├── data/                           # Phased VCF input
 ├── db/                             # PrimeKG kg.csv, reference genome index
-├── results/                        # All outputs (JSON, reports, FAISS indices)
+├── results/
+│   ├── harness_runs/               # Per-run artifacts: spec, contracts, sprint outputs, eval logs
+│   └── ...                         # JSON reports, FAISS indices
 ├── images/                         # Documentation images
 ├── gene_list.json                  # Genes of interest (user-created)
 ├── environment.yml                 # Conda environment
@@ -233,17 +335,17 @@ LangSmith is optional. The workflow runs without `LANGSMITH_API_KEY`; set it onl
 ### Discussion and Ongoing Work
 
 **Current limitations:**
-- Variant curation (`_variant_curator_agent`) is a placeholder; full ClinVar integration is in progress to achieve variant -> disease/phenotype curation.
+- Variant curation (`_variant_curator_agent`) is a placeholder; full ClinVar integration is in progress to achieve variant → disease/phenotype curation.
 - Regulatory element analysis (promoters, enhancers) is not yet implemented.
-- Quality scores depend on the LLM's self-assessment ability, which can be inconsistent.
+- The harness evaluator's PubMed active verification is limited to 8 claims per sprint to respect NCBI rate limits; deeper coverage requires a paid API tier.
 - GeneCards scraping may break with website changes; a direct API integration would be more robust.
 
 **Planned improvements:**
 1. Full ClinVar-based variant curation with structured evidence levels (pathogenic/likely pathogenic/VUS).
 2. Regulatory element annotation (promoter, enhancer, UTR variants).
-3. Systematic evaluation: compare multi-agent output against manually curated gold-standard gene reports.
-4. Persistent LangGraph checkpointing for resumable long-running analyses.
-5. Batch processing optimization for large gene panels (100+ genes).
+3. Systematic harness evaluation: run v2 vs. v3 on a gold-standard gene panel and measure hallucination rate and citation accuracy.
+4. Harness resume: load `harness_state.json` to skip completed sprints on re-run.
+5. Batch processing for large gene panels (100+ genes) with parallel sprint execution.
 
 ---
 
@@ -266,3 +368,4 @@ LangSmith is optional. The workflow runs without `LANGSMITH_API_KEY`; set it onl
 15. [Sentence Transformers](https://www.sbert.net/) - Text embeddings
 16. [stLFR](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6499310/) - Co-barcoded NGS reads
 17. [liftOver](http://hgdownload.cse.ucsc.edu/goldenPath/hg38/liftOver/) - Genome coordinate conversion
+18. [Harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-for-long-running-application-development) - Rajasekaran et al., Anthropic 2026 — design principles behind the v3 harness
