@@ -23,3 +23,17 @@ pipeline_debug.json
 .idea/
 
 memory/
+docs/
+
+# Eval layer is tracked - it is the evidence. Only the regenerable API response
+# cache is ignored; gold snapshots stay in-tree because the ClinGen source file
+# changes daily and cannot be re-derived after the fact.
+eval_harness/cache/
+eval_harness/gold/
+eval_harness/results/
+eval_harness/README.md
+
+# Regenerable scratch/build artifacts: disposable tabix region files and FAISS
+# vector indices. Rebuildable from source data in minutes; not evidence.
+results/_am_regions/
+results/*_faiss_index/

@@ -22,3 +22,4 @@ dependencies:
     - beautifulsoup4
     - tavily-python
     - python-dotenv
+    - pymupdf
