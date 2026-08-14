@@ -10,7 +10,7 @@
 
 本项目使用多智能体 LLM 工作流（结合检索增强生成 RAG、知识图谱和迭代质量控制）自动化完成这一解读过程。
 
-**关键词：** 多智能体系统, RAG, FAISS, LLM, 单倍型分相, 基因/变异解读, 知识图谱, PubMed, GeneCards, arXiv, Tavily, 幻觉抑制, LangChain, LangGraph, LangSmith
+**关键词：** 多智能体系统, RAG, FAISS, LLM, 单倍型分相, 基因/变异解读, 知识图谱, PubMed, GeneCards, arXiv, Tavily, 幻觉抑制, LangChain, LangGraph, LangSmith, 外部证据评估, ClinGen, gnomAD, AlphaMissense, LLM Concordance 测试, 确定性打分, Loss-of-Function QC
 
 ---
 
@@ -259,6 +259,110 @@ result = run_harness("P2RX5")
 python eval_harness/run_harness.py --tasks eval_harness/tasks/p2rx5_harness_v2.json
 ```
 
+需要说清楚这条命令证明了什么、没证明什么：它检查的是「agent 自己的评分有没有过
+agent 自己的阈值」。这是回归测试，不是正确性测试。正确性由下面这层单独评估。
+
+#### 第四步：外部证据评估（External-Evidence Evaluation）
+
+生成器和评审器共用同一个模型家族和同一套 prompt 血统，因此共享盲点；在这个闭环
+内部产出的任何数字都无法证明这个闭环本身。`eval_harness/external/` 这一层把
+「输出是否正确」拆开，把每一部分交给真正能回答它的外部来源——引用交给 PubMed，
+标签交给 ClinGen 和 ClinVar 专家 panel——并明确写出哪些部分在没有自有人工复核
+的条件下仍然无法回答。
+
+```bash
+# 客观引用审计：PMID 是否存在、是否来自检索上下文、metadata 是否一致、是否被撤稿
+python eval_harness/external/citation_audit.py --gene P2RX5
+
+# 冻结并版本化的外部 gold set（ClinGen 基因-疾病 + ClinVar 三星专家 panel）
+python eval_harness/external/build_gold_set.py --source all --n 200
+
+# 审计逻辑自身的回归测试（不联网）
+python eval_harness/external/test_external_eval.py
+```
+
+**首次运行的结论：引用可解析率为 0.000** —— 7 个 P2RX5 产物、6 种 approach 全部
+如此：191 条 claim、20 个引用标记，没有任何一个带可解析的标识符。curator 输出的
+是 `[PubMed: Razzoli et al.]`、`[GeneCards]` 这类标记，点了来源但没有 id；而检索
+层本身握有 10 个真实 PMID，它们在到达输出之前就被丢掉了。因此当前这套系统的
+引用幻觉率**在两个方向上都不可测**——不是好，也不是坏，是无法核查。这是 prompt/
+schema 层面的缺陷，也是其他所有引用类指标的前置条件。
+
+完整内容见 [`eval_harness/external/README.md`](eval_harness/external/README.md)：
+在没有人工复核时哪些成分可验证的完整拆解、为什么 claim–evidence entailment 被
+刻意留作未实现，以及 gold set 的抽样与污染控制设计。
+
+#### 第五步：Concordance 测试，以及 curator 架构为什么改了
+
+200 题 ClinGen gold set 可以问一个更硬的问题：不是"引用能不能核查"，而是"分类结果
+和专家 curation 一不一致"。跨两个模型 + 一组 hidden-reasoning 对照跑了一遍
+（共 600 次任务运行，合计约 $1.6）：
+
+| arm | DeepSeek | DeepSeek + reasoning | Gemini 3 Flash |
+|---|---:|---:|---:|
+| direct | 0.215 | 0.220 | 0.265 |
+| rag | 0.080 | 0.125 | 0.195 |
+| agentic | 0.095 | 0.117 | 0.250 |
+| agentic_revision | 0.065 | 未跑完 | 0.225 |
+
+（`accuracy_all`，对七分类；随机基线 0.143。）两个结论站得住：**"revision 有用"
+和"revision 有害"都对，只是取决于模型**（DeepSeek 上最差、Gemini 上最好——只跑
+一个模型会得出错误的一般化结论）；以及**两个模型共享同一个真实缺陷**：能认出
+"证据确凿"（Definitive）的关系，但分不清 Moderate、Disputed、Refuted。
+
+这个缺陷有机制解释。ClinGen 的分类不是判断题，是积分制：遗传学证据封顶 12 分，
+实验证据封顶 6 分，**Strong 和 Definitive 落在完全相同的 12–18 分区间**——唯一区别
+是证据是否跨 ≥3 年由 ≥2 篇独立文献重复验证。这是对发表日期的记账运算，不是读几篇
+摘要就能推断出来的判断。
+
+所以架构改成了和 text-to-SQL 拆分「翻译」与「执行」同样的方式：模型读一篇论文，
+输出结构化证据（读了哪些论文、多少个先证者、属于哪个积分档），确定性引擎
+（[`src/clingen_scoring.py`](src/clingen_scoring.py)，24 个测试）套用 ClinGen 自己
+的封顶规则和重复验证规则，算出档位。模型不再直接输出分类结果。
+[`eval_harness/external/clingen_evidence.py`](eval_harness/external/clingen_evidence.py)
+抓取 ClinGen 的 assertion 页面，做成逐字段 gold，用于评估抽取准确率；
+[`src/evidence_extraction.py`](src/evidence_extraction.py) 负责抽取本身——用的是
+读自 ClinGen 真实记录的受控词表，跨文献 proband 去重靠模型报告的可识别特征确定性
+计算（而不是让模型直接给一个不可查的匹配结果），并对自己的输出做伪造检测（第一次
+真实运行就抓到过一次：只有摘要的来源里"nine individuals"被展开成九条记录，
+全部共用一个编造的变异编号）。
+
+这条路径的实测天花板：ClinGen 计分的论文里，只有约 **20%** 能被自动抓取到机器可读
+全文（159 篇计分论文中 61.6% 有 PMCID，其中只有 32% 允许下载 XML——大多数出版商
+直接禁止）。这个天花板属于「自动抓取」这条路径，不属于「curator 能读到什么」——
+真实 curator 靠机构订阅能看到那 80% 非开放获取的论文，所以
+`evidence_extraction.py --pdf <file>` 直接接受 curator 提供的 PDF，并对扫描件
+（无文本层）和传错文件（正文里搜不到基因名）两种失误做了防护。
+
+#### 双等位 LoF 筛查（`src/lof_qc.py`）
+
+背景部分提到的 compound-heterozygosity 筛查——在同一 phase set 内两条单倍型都有
+HIGH-impact 变异的基因——最初直接用裸 VEP `IMPACT=HIGH`，没有任何下游过滤，而且
+consequence 选择逻辑对每个变异只任意挑一条 CSQ，chr22 测试里漏检了 79% 的真实
+HIGH 变异（63 个只测出 13 个），还至少发生过一次基因归错。`lof_qc.py` 修正了选择
+逻辑（保留每个 gene/transcript consequence，不塌缩成一条）并加上真正的 LoF 过滤链：
+非编码转录本、仅 MANE Select、NMD 逃逸（50nt 规则）、gnomAD 等位基因频率、gnomAD
+纯合子耐受——刻意**不用** pLI/LOEUF，这两个指标衡量的是对杂合 LoF 的不耐受，会
+优先剔除掉隐性筛查真正要找的阳性（gnomAD v4.0 真实值：CFTR 的 LOEUF = 1.153，
+这个教科书级隐性致病基因恰好落在"耐受"区间）。
+
+在一份真实个体的全基因组 VCF（`data/human/`，489 万条记录）上跑：143 个原始候选
+基因，QC 后剩 **3** 个，全部是纯合 LoF，没有一个来自分相判定为 trans 的 compound
+het。此前一次静默失败的 gnomAD 查询曾让两个常见多态（TMEM216 AF 0.72/4.3 万纯合子，
+VDR AF 0.66/3.4 万纯合子）混进候选——现在频率查询失败会升级而不是静默放行，
+在基因组流水线里这个区分值得刻意做对。在真正需要分相判定的 11 个基因（≥2 个杂合
+LoF）里，6 个被分相解出（4 个 trans，2 个 cis），5 个无法判定——**分相判定率
+54.5%**，比裸基因计数更诚实的核心指标。
+
+把筛查扩展到 HIGH+MODERATE 配对（CFTR 那种经典的 null+missense 组合，纯 HIGH
+筛查在结构上就测不到）候选数涨了 80 倍，但增量大部分是排不出序的
+missense/missense 配对。[AlphaMissense](https://www.nature.com/articles/s41586-023-06821-8)
+致病性评分把 306 个 MODERATE/MODERATE trans 候选、在要求两侧都是
+`likely_pathogenic` 后收窄到 1 个——这里有用的是收益而不是判别力 AUC（这个个体
+的 callset 里只有 2 个 ClinVar 标记为致病的变异，样本太小算不出可靠 AUC）。
+AlphaMissense 许可证是 CC-BY-NC-SA 4.0——仅限评估和 portfolio 使用，未经许可证
+审查不能进生产。
+
 #### 性能指标
 
 | 指标 | 数值 |
@@ -324,14 +428,32 @@ python eval_harness/run_harness.py --tasks eval_harness/tasks/p2rx5_harness_v2.j
 │   ├── llm_rag.py                  # 单智能体 RAG 方案
 │   ├── llm_augmented.py            # 简单文献增强
 │   ├── llm_queryAlone.py           # 仅 LLM 基线
-│   └── config.py                   # API key 管理
+│   ├── config.py                   # API key 管理
+│   ├── lof_qc.py                   # 第五步：双等位 LoF 筛查 + QC 过滤链
+│   ├── test_lof_qc.py              # 37 个测试，含 cis/trans 分相逻辑
+│   ├── eval_alphamissense.py       # AlphaMissense 覆盖率/判别力/收益评估
+│   ├── clingen_scoring.py          # 确定性 ClinGen 积分打分引擎
+│   ├── test_clingen_scoring.py     # 24 个测试，含 NANS 端到端复现
+│   ├── evidence_extraction.py      # LLM 证据抽取（含 --pdf 摄入路径）
+│   └── test_evidence_extraction.py # 17 个测试，含合成 PDF fixture
 ├── eval_harness/
 │   ├── run_harness.py              # 确定性产物检验器（不调用 LLM）
-│   └── tasks/
-│       ├── p2rx5_smoke.json        # v2 验收任务
-│       └── p2rx5_harness_v2.json   # v3 harness 验收任务
+│   ├── tasks/
+│   │   ├── p2rx5_smoke.json        # v2 验收任务
+│   │   └── p2rx5_harness_v2.json   # v3 harness 验收任务
+│   ├── external/                   # 第四/五步：外部证据评估层
+│   │   ├── citation_audit.py       # 客观 PMID/引用审计（不用 LLM）
+│   │   ├── build_gold_set.py       # 冻结版 ClinGen/ClinVar gold set 构建器
+│   │   ├── clingen_evidence.py     # 逐字段 ClinGen 证据抓取器（gold）
+│   │   ├── run_concordance.py      # curator vs ClinGen concordance 运行器
+│   │   ├── pubmed_client.py        # 带缓存、限速的 PubMed E-utilities 客户端
+│   │   └── test_external_eval.py   # 37 个测试，不联网
+│   ├── gold/                       # 冻结的 gold set 快照 + manifest（纳入版本库）
+│   └── cache/                      # API 响应缓存（.gitignore，可再生）
 ├── data/                           # 分相 VCF 输入
+│   └── human/                      # 第五步评估用的真实个体 VCF
 ├── db/                             # PrimeKG kg.csv, 参考基因组索引
+│   └── annot/                      # ClinVar VCF、AlphaMissense 评分（.gitignore）
 ├── results/
 │   ├── harness_runs/               # 每次运行的中间产物：规格、合同、sprint 输出、评估日志
 │   └── ...                         # JSON 报告, FAISS 索引
@@ -346,17 +468,33 @@ python eval_harness/run_harness.py --tasks eval_harness/tasks/p2rx5_harness_v2.j
 ### 讨论与后续工作
 
 **当前局限：**
-- 变异解读（`_variant_curator_agent`）目前为占位实现，完整 ClinVar 集成正在进行中。
+- v2/v3 curator 输出的引用可解析率为 0.000（第四步）——生成器输出的是
+  `[PubMed: Author et al.]` 这类标记，没有 PMID，所以幻觉率目前既不能说好也不能说坏，
+  是不可测。这是当前优先级最高的修复项，其他所有引用类指标都卡在它上面。
+- 直接让 LLM 判断分类档位（Definitive/Strong/.../Refuted）是个弱目标——见第五步——
+  但 v2/v3 curator 目前仍是直接要求它输出档位，还没接入确定性打分器。
+- 证据抽取流水线（`evidence_extraction.py`）只在一个合成 fixture 上做过端到端验证；
+  还没有针对 `clingen_evidence.py` 的逐字段 gold 做规模化评分，跨文献 proband 去重
+  也还没有在真实的多论文基因上跑过。
+- 全文自动检索只覆盖 ClinGen 计分论文的约 20%；`--pdf` 路径为有期刊访问权限的
+  curator 去掉了这个天花板，但还没在真实的付费墙论文上测试过。
 - 调控元件分析（启动子、增强子）尚未实现。
-- Harness 评估器的 PubMed 主动验证每个 sprint 上限为 8 条声明，以满足 NCBI 速率限制；更大覆盖范围需要付费 API 等级。
 - GeneCards 的网页抓取可能因网站改版而失效，直接 API 集成更为稳健。
 
 **计划改进：**
-1. 完整的基于 ClinVar 的变异解读，包含结构化证据等级（致病性/可能致病/VUS）。
-2. 调控元件注释（启动子、增强子、UTR 变异）。
-3. 系统评估：在金标准基因 panel 上对比 v2 和 v3 harness，测量幻觉率和引用准确率。
-4. Harness 断点续跑：加载 `harness_state.json` 跳过已完成的 sprint。
-5. 大基因 panel（100+ 基因）的并行 sprint 批处理优化。
+1. 让引用可解析（要求输出 `[PMID: nnnnnnnn]`，把 PMID 带进 RAG 分块），
+   重跑 `citation_audit.py` 拿到真实的率。
+2. 把 `evidence_extraction.py` 对着 `clingen_evidence.py` gold 做逐字段评分
+   （proband 数、scored-publication 召回/精确率、变异类型一致性）+ 错误归因，
+   而不是在档位层面比对。
+3. 在一个真实的多论文基因上跑通跨文献 proband 去重，和 ClinGen 的最终计数对比。
+4. 调控元件注释（启动子、增强子、UTR 变异）。
+5. Harness 断点续跑：加载 `harness_state.json` 跳过已完成的 sprint。
+6. 大基因 panel（100+ 基因）的并行 sprint 批处理优化。
+
+**已完成（原计划改进 #3）：** 系统性评估 v2/v3/agentic-revision，测 concordance 和
+幻觉率（第五步）——诚实的结果是「直接做档位分类」本身就是错的目标，不是 curator
+在这个目标上表现好。
 
 ---
 
@@ -380,3 +518,8 @@ python eval_harness/run_harness.py --tasks eval_harness/tasks/p2rx5_harness_v2.j
 16. [stLFR](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6499310/) - 共条形码 NGS 读段
 17. [liftOver](http://hgdownload.cse.ucsc.edu/goldenPath/hg38/liftOver/) - 基因组坐标转换
 18. [Harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-for-long-running-application-development) - Rajasekaran 等，Anthropic 2026 — v3 harness 的设计原则来源
+19. [ClinGen Gene-Disease Validity SOP](https://clinicalgenome.org/docs/gene-disease-validity-standard-operating-procedure/) - `clingen_scoring.py` 实现的积分打分框架
+20. [gnomAD](https://gnomad.broadinstitute.org/) - `lof_qc.py` 使用的人群等位基因频率与 constraint 指标
+21. [AlphaMissense](https://www.nature.com/articles/s41586-023-06821-8) - Cheng 等，Nature 2023 — 错义变异致病性评分（CC-BY-NC-SA 4.0，仅限评估用途）
+22. [MANE](https://www.ncbi.nlm.nih.gov/refseq/MANE/) - Matched Annotation from NCBI and EMBL-EBI，canonical 转录本选择
+23. [PyMuPDF](https://pymupdf.readthedocs.io/) - curator 提供论文摄入路径所用的 PDF 文本抽取库

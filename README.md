@@ -10,7 +10,7 @@ Interpreting phased variants -- linking genotypes to gene function, disease mech
 
 This project automates that interpretation using a multi-agent LLM workflow with retrieval-augmented generation (RAG), knowledge graph integration, and iterative quality control.
 
-**Keywords:** Multi-Agent Systems, RAG, FAISS, LLM, Haplotype Phasing, Gene/Variant Curation, Knowledge Graph, PubMed, GeneCards, arXiv, Tavily, Hallucination Reduction, LangChain, LangGraph, LangSmith
+**Keywords:** Multi-Agent Systems, RAG, FAISS, LLM, Haplotype Phasing, Gene/Variant Curation, Knowledge Graph, PubMed, GeneCards, arXiv, Tavily, Hallucination Reduction, LangChain, LangGraph, LangSmith, External-Evidence Evaluation, ClinGen, gnomAD, AlphaMissense, LLM Concordance Testing, Deterministic Scoring, Loss-of-Function QC
 
 ---
 
@@ -257,6 +257,132 @@ Verify a harness run against deterministic acceptance criteria:
 python eval_harness/run_harness.py --tasks eval_harness/tasks/p2rx5_harness_v2.json
 ```
 
+Note what that command does and does not establish: it checks whether the agent's
+own score cleared the agent's own threshold. It is a regression test, not a
+correctness test. Correctness is evaluated separately, against sources outside
+the system — see below.
+
+#### Step 4: External-Evidence Evaluation
+
+Generator and evaluator share a model family and a prompt lineage, so they share
+blind spots, and no number produced inside that loop can certify it. The
+`eval_harness/external/` layer routes each part of "is this correct?" to a source
+that can actually answer it — PubMed for citations, ClinGen and ClinVar expert
+panels for labels — and states plainly which parts remain unanswerable without a
+human reviewer.
+
+```bash
+# Objective citation audit: PMID existence, retrieval grounding, metadata, retractions
+python eval_harness/external/citation_audit.py --gene P2RX5
+
+# Frozen, versioned external gold set (ClinGen gene-disease + ClinVar 3-star)
+python eval_harness/external/build_gold_set.py --source all --n 200
+
+# Regression tests for the audit logic itself (no network)
+python eval_harness/external/test_external_eval.py
+```
+
+**First-run finding: citation resolvability is 0.000** across all 7 P2RX5
+artifacts and all 6 approaches — 191 claims, 20 citation markers, none carrying a
+resolvable identifier. The curator emits `[PubMed: Razzoli et al.]` and
+`[GeneCards]`, which name a source but carry no id, while the retrieval layer
+holds 10 real PMIDs that are dropped before reaching the output. So the
+hallucinated-citation rate is currently **unmeasurable in either direction** —
+not good, not bad, uncheckable. That is a prompt/schema defect and a prerequisite
+for every other citation metric.
+
+See [`eval_harness/external/README.md`](eval_harness/external/README.md) for the
+full decomposition of what is verifiable without a human reviewer, why
+claim–evidence entailment is deliberately left unimplemented, and the gold-set
+sampling and contamination-control design.
+
+#### Step 5: Concordance Testing, and Why the Curator's Architecture Changed
+
+The 200-task ClinGen gold set makes it possible to ask the harder question: not
+"are the citations checkable" but "does the curator's classification agree with
+expert curation." Run across two models and a hidden-reasoning control (600 tasks
+total, $1.6 combined):
+
+| arm | DeepSeek | DeepSeek + reasoning | Gemini 3 Flash |
+|---|---:|---:|---:|
+| direct | 0.215 | 0.220 | 0.265 |
+| rag | 0.080 | 0.125 | 0.195 |
+| agentic | 0.095 | 0.117 | 0.250 |
+| agentic_revision | 0.065 | n/a | 0.225 |
+
+(`accuracy_all` against a 7-way label space; random baseline 0.143.) Two findings
+survived scrutiny: **"revision helps" and "revision hurts" are both true, model-
+dependently** (worst arm on DeepSeek, best on Gemini — a single-model run would
+have produced a false general claim), and **both models share a real failure**:
+they recognize a well-established (Definitive) gene-disease relationship but
+cannot distinguish Moderate from Disputed from Refuted.
+
+That failure has a mechanistic explanation. ClinGen classification is not a
+judgement call, it is points: genetic evidence capped at 12, experimental at 6,
+and **Strong and Definitive occupy the identical 12–18 point range** — separated
+only by whether ≥2 publications replicated the finding across ≥3 years. That is
+bookkeeping over dates, not something inferable from skimming a few abstracts.
+
+So the architecture changed to match how text-to-SQL splits translation from
+execution: the model reads one paper and emits structured evidence (which papers,
+how many probands, what point category); a deterministic engine
+([`src/clingen_scoring.py`](src/clingen_scoring.py), 24 tests) applies ClinGen's
+own caps and replication rule and computes the tier. The model never outputs a
+classification directly. [`eval_harness/external/clingen_evidence.py`](eval_harness/external/clingen_evidence.py)
+scrapes ClinGen's assertion pages into field-level gold for scoring extraction
+accuracy this way, and [`src/evidence_extraction.py`](src/evidence_extraction.py)
+does the extraction — using controlled vocabularies read off ClinGen's real
+records, computing cross-paper proband de-duplication deterministically from
+model-reported identifying features rather than trusting an opaque match, and
+rejecting its own output when it looks fabricated (caught on the first live run:
+an abstract-only source had "nine individuals" expanded into nine records sharing
+one invented variant string).
+
+Measured ceiling on this approach: only **~20%** of ClinGen-scored publications are
+open-access enough to fetch programmatically in full text (of 159 scored PMIDs,
+61.6% have a PMCID, and only 32% of those permit XML download — most publishers
+block it outright). That ceiling belongs to automated fetching, not to what a real
+curator can read via institutional access, so `evidence_extraction.py --pdf <file>`
+accepts a curator-supplied PDF directly, with guards against a scanned page (no
+text layer) and a wrong-file upload (gene symbol absent from the extracted text).
+
+#### Biallelic LoF Screen (`src/lof_qc.py`)
+
+The compound-heterozygosity screen described in Background — genes with a
+HIGH-impact variant on *both* haplotypes within one phase set — originally used
+raw VEP `IMPACT=HIGH` with no downstream filtering, and its consequence-selection
+logic picked one CSQ entry per variant somewhat arbitrarily, missing 79% of true
+HIGH calls on a chr22 test (13 of 63 detected) and at least one outright
+mis-attribution to a neighbouring gene. `lof_qc.py` fixes the selection (every
+gene/transcript consequence is kept, not collapsed to one) and adds a real LoF
+filter chain: non-coding-transcript, MANE-Select-only, NMD-escape (50nt rule),
+gnomAD allele frequency, and gnomAD homozygote tolerance — deliberately *not*
+pLI/LOEUF, which measure heterozygous-LoF intolerance and would preferentially
+discard the true positives a *recessive* screen is looking for (real gnomAD v4.0
+values: CFTR LOEUF = 1.153, the textbook recessive disease gene, sits squarely in
+"tolerant" territory).
+
+Whole-genome run on a real individual VCF (`data/human/`, 4.89M records): 143 raw
+candidate genes → **3** after QC, all homozygous LoF, none from a phase-resolved
+compound-heterozygous pair. A silently-failed gnomAD lookup earlier let two common
+polymorphisms (TMEM216 AF 0.72/43k homozygotes, VDR AF 0.66/34k homozygotes)
+through as false candidates — now a failed frequency lookup escalates rather than
+passing silently, a distinction worth being deliberate about in a genomics
+pipeline. Of the 11 genes where phase actually mattered (≥2 heterozygous LoF
+calls), 6 were phase-resolved (4 trans, 2 cis) and 5 could not be determined —
+**54.5% phase-resolution rate**, a more honest headline metric than a raw gene count.
+
+Extending the screen to HIGH+MODERATE pairs (compound-het configurations like
+CFTR's canonical null+missense, which the HIGH-only screen structurally misses)
+raises candidate count 80× but most of the increase is unranked missense/missense
+pairs. [AlphaMissense](https://www.nature.com/articles/s41586-023-06821-8)
+pathogenicity scores narrow 306 MODERATE/MODERATE trans candidates to 1 when both
+sides are required to score `likely_pathogenic` — the yield, not the discrimination
+AUC, is the usable result here (only 2 ClinVar-labelled pathogenic variants exist
+in this individual's callset, too few for a reliable AUC on this sample).
+AlphaMissense is CC-BY-NC-SA 4.0 — evaluation and portfolio use only, not
+production, without a licence review.
+
 ---
 
 ### Setup
@@ -313,14 +439,32 @@ python eval_harness/run_harness.py --tasks eval_harness/tasks/p2rx5_harness_v2.j
 │   ├── llm_rag.py                  # Single-agent RAG approach
 │   ├── llm_augmented.py            # Simple literature augmentation
 │   ├── llm_queryAlone.py           # LLM-only baseline
-│   └── config.py                   # API key management
+│   ├── config.py                   # API key management
+│   ├── lof_qc.py                   # Step 5: biallelic LoF screen + QC filter chain
+│   ├── test_lof_qc.py              # 37 tests, incl. cis/trans phasing logic
+│   ├── eval_alphamissense.py       # AlphaMissense coverage/discrimination/yield eval
+│   ├── clingen_scoring.py          # Deterministic ClinGen point-scoring engine
+│   ├── test_clingen_scoring.py     # 24 tests, incl. end-to-end NANS reproduction
+│   ├── evidence_extraction.py      # LLM evidence extraction (+ --pdf ingestion path)
+│   └── test_evidence_extraction.py # 17 tests, incl. synthetic-PDF fixtures
 ├── eval_harness/
 │   ├── run_harness.py              # Deterministic artifact checker (no LLM calls)
-│   └── tasks/
-│       ├── p2rx5_smoke.json        # v2 acceptance task
-│       └── p2rx5_harness_v2.json   # v3 harness acceptance task
+│   ├── tasks/
+│   │   ├── p2rx5_smoke.json        # v2 acceptance task
+│   │   └── p2rx5_harness_v2.json   # v3 harness acceptance task
+│   ├── external/                   # Step 4/5: external-evidence eval layer
+│   │   ├── citation_audit.py       # Objective PMID/citation checker (no LLM)
+│   │   ├── build_gold_set.py       # Frozen ClinGen/ClinVar gold-set builder
+│   │   ├── clingen_evidence.py     # Field-level ClinGen evidence scraper (gold)
+│   │   ├── run_concordance.py      # Curator-vs-ClinGen concordance runner
+│   │   ├── pubmed_client.py        # Cached, rate-limited PubMed E-utilities client
+│   │   └── test_external_eval.py   # 37 tests, no network
+│   ├── gold/                       # Frozen gold-set snapshots + manifest (tracked)
+│   └── cache/                      # API response cache (gitignored, regenerable)
 ├── data/                           # Phased VCF input
+│   └── human/                      # Real-individual VCF for Step 5 evaluation
 ├── db/                             # PrimeKG kg.csv, reference genome index
+│   └── annot/                      # ClinVar VCF, AlphaMissense scores (gitignored)
 ├── results/
 │   ├── harness_runs/               # Per-run artifacts: spec, contracts, sprint outputs, eval logs
 │   └── ...                         # JSON reports, FAISS indices
@@ -335,17 +479,39 @@ python eval_harness/run_harness.py --tasks eval_harness/tasks/p2rx5_harness_v2.j
 ### Discussion and Ongoing Work
 
 **Current limitations:**
-- Variant curation (`_variant_curator_agent`) is a placeholder; full ClinVar integration is in progress to achieve variant → disease/phenotype curation.
+- Citation resolvability in the v2/v3 curator output is 0.000 (Step 4) — the
+  generator emits `[PubMed: Author et al.]` markers with no PMID, so hallucination
+  rate is currently unmeasurable rather than known-good or known-bad. This is the
+  single highest-priority fix; every downstream citation metric is blocked on it.
+- Tier classification (Definitive/Strong/.../Refuted) is a weak target for direct
+  LLM judgement — see Step 5 — and the curator's v2/v3 output still asks for it
+  directly rather than routing through the deterministic scorer.
+- The evidence-extraction pipeline (`evidence_extraction.py`) is validated on one
+  synthetic fixture end-to-end; it has not yet been scored against the field-level
+  `clingen_evidence.py` gold at scale, and cross-publication proband
+  de-duplication has not been run across a real multi-paper gene.
+- Full-text retrieval covers only ~20% of ClinGen-scored publications
+  automatically; the `--pdf` path removes this ceiling for a curator with journal
+  access but has not been tested against a real paywalled paper.
 - Regulatory element analysis (promoters, enhancers) is not yet implemented.
-- The harness evaluator's PubMed active verification is limited to 8 claims per sprint to respect NCBI rate limits; deeper coverage requires a paid API tier.
 - GeneCards scraping may break with website changes; a direct API integration would be more robust.
 
 **Planned improvements:**
-1. Full ClinVar-based variant curation with structured evidence levels (pathogenic/likely pathogenic/VUS).
-2. Regulatory element annotation (promoter, enhancer, UTR variants).
-3. Systematic harness evaluation: run v2 vs. v3 on a gold-standard gene panel and measure hallucination rate and citation accuracy.
-4. Harness resume: load `harness_state.json` to skip completed sprints on re-run.
-5. Batch processing for large gene panels (100+ genes) with parallel sprint execution.
+1. Make citations resolvable (require `[PMID: nnnnnnnn]`, thread PMIDs through RAG
+   chunking) and re-run `citation_audit.py` for a real rate.
+2. Score `evidence_extraction.py` against `clingen_evidence.py` gold at the field
+   level (proband count, scored-publication recall, variant type) with error
+   attribution, rather than at the tier level.
+3. Run cross-publication proband de-duplication end to end on a real multi-paper
+   gene and compare the resulting proband count to ClinGen's.
+4. Regulatory element annotation (promoter, enhancer, UTR variants).
+5. Harness resume: load `harness_state.json` to skip completed sprints on re-run.
+6. Batch processing for large gene panels (100+ genes) with parallel sprint execution.
+
+**Done, previously listed here as planned:** systematic v2/v3/agentic-revision
+evaluation with concordance and hallucination measurement (Step 5) — the honest
+result was that direct tier classification is the wrong target, not that the
+curator scored well on it.
 
 ---
 
@@ -369,3 +535,8 @@ python eval_harness/run_harness.py --tasks eval_harness/tasks/p2rx5_harness_v2.j
 16. [stLFR](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6499310/) - Co-barcoded NGS reads
 17. [liftOver](http://hgdownload.cse.ucsc.edu/goldenPath/hg38/liftOver/) - Genome coordinate conversion
 18. [Harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-for-long-running-application-development) - Rajasekaran et al., Anthropic 2026 — design principles behind the v3 harness
+19. [ClinGen Gene-Disease Validity SOP](https://clinicalgenome.org/docs/gene-disease-validity-standard-operating-procedure/) - the point-scoring framework `clingen_scoring.py` implements
+20. [gnomAD](https://gnomad.broadinstitute.org/) - population allele frequency and constraint metrics used by `lof_qc.py`
+21. [AlphaMissense](https://www.nature.com/articles/s41586-023-06821-8) - Cheng et al., Nature 2023 — missense pathogenicity scores (CC-BY-NC-SA 4.0, evaluation use only)
+22. [MANE](https://www.ncbi.nlm.nih.gov/refseq/MANE/) - Matched Annotation from NCBI and EMBL-EBI, canonical transcript selection
+23. [PyMuPDF](https://pymupdf.readthedocs.io/) - PDF text extraction for the curator-supplied-paper ingestion path
